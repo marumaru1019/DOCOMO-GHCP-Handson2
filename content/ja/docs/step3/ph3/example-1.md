@@ -354,9 +354,9 @@ CREATE TABLE Vehicles (
 -- サンプル車両データの登録 (HONDA車)
 INSERT INTO Vehicles (VehicleID, Make, Model, Year, Type, Location, Status)
 VALUES
-    (1, N'HONDA', N'Civic', 2022, N'コンパクト', N'東京', N'利用可能'),
-    (2, N'HONDA', N'Accord', 2023, N'セダン', N'大阪', N'利用中'),
-    (3, N'HONDA', N'Fit', 2022, N'コンパクト', N'京都', N'利用可能');
+    (1, N'Honda', N'Civic', 2022, N'コンパクト', N'東京', N'利用可能'),
+    (2, N'Honda', N'Accord', 2023, N'セダン', N'大阪', N'利用中'),
+    (3, N'Honda', N'Fit', 2022, N'コンパクト', N'京都', N'利用可能');
 
 -- 予約テーブルの作成
 CREATE TABLE Reservations (
