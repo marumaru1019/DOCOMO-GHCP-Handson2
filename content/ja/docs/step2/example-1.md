@@ -10,7 +10,7 @@ tags: [Few-shot, sample, docs]
 次のプロンプトを、ChatGPTに入力します。
 
 ```text
-私はHONDAのエンジン設計部門に入社したばかりの新入社員です。
+私はHondaのエンジン設計部門に入社したばかりの新入社員です。
 設計会議を調整するためのメールを書いてください。
 
 #内容
@@ -63,7 +63,7 @@ Subject: 設計会議の日程調整とアジェンダ案について
 よろしくお願い申し上げます。
 
 [あなたの名前]
-HONDA エンジン設計部門新入社員
+Honda エンジン設計部門新入社員
 
 ---
 
@@ -71,7 +71,7 @@ Subject: Scheduling of Design Meeting and Proposed Agenda
 
 Everyone,
 
-I am [Your Name], a new employee in HONDA's Engine Design Department, and I have been tasked with coordinating our design meetings. I would like to express my gratitude for your cooperation.
+I am [Your Name], a new employee in Honda's Engine Design Department, and I have been tasked with coordinating our design meetings. I would like to express my gratitude for your cooperation.
 
 I would like to propose some candidate dates for the design meeting and share a preliminary agenda. Your input on the proposed dates and agenda is highly appreciated.
 
@@ -96,5 +96,5 @@ We apologize for any inconvenience and appreciate your prompt response.
 Best regards,
 
 [Your Name]
-New Employee, HONDA Engine Design Department
+New Employee, Honda Engine Design Department
 

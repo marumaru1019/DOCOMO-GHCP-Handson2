@@ -1,6 +1,6 @@
 ---
 title: ③プログラム設計開発
-description: HONDA様向けプロンプトエンジニアリングワークショップ資料
+description: Honda様向けプロンプトエンジニアリングワークショップ資料
 categories: [設備管理, 入門]
 tags: [test, docs]
 weight: 4

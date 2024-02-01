@@ -1,6 +1,6 @@
 ---
 title: 日常業務で使えるテクニック
-description: HONDA様向けプロンプトエンジニアリングワークショップ資料
+description: Honda様向けプロンプトエンジニアリングワークショップ資料
 categories: [設備管理, 入門]
 tags: [test, docs]
 weight: 3
