@@ -2,6 +2,7 @@
 title: ④いくつかの例を示す
 categories: [基本テクニック]
 tags: [Few-shot, sample, docs]
+weight: 4
 ---
 
 次のようにいくつかの類似した質問をしたあとに、モデルに回答させたい問いを書きます。

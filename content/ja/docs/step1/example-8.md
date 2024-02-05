@@ -2,6 +2,7 @@
 title: ⑧ 回答を評価しながら質問を繰り返す
 categories: [基本テクニック]
 tags: [Few-shot, sample, docs]
+weight: 8
 ---
 
 指示を複数回にわけ、回答を評価しながら指示をだす方法です。評価を挟むことで、意図した回答になるよう軌道修正します。これを「Tree of Thoughts」と呼びます。

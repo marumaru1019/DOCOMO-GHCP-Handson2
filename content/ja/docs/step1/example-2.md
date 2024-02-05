@@ -2,6 +2,7 @@
 title: ②出力形式を指定する
 categories: [Examples]
 tags: [test, sample, docs]
+weight: 2
 ---
 
 

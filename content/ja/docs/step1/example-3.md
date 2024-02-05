@@ -2,6 +2,7 @@
 title: ③情報を与えずに指示をする
 categories: [Examples]
 tags: [test, sample, docs]
+weight: 3
 ---
 
 あらかじめ事前情報与えずに、質問や指示のみを入力する方法です。プロンプトが短くて済みますが、複雑な質問に回答できない場合もあります。

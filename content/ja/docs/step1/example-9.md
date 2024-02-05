@@ -2,6 +2,7 @@
 title: ⑨ 感情を追加する
 categories: [基本テクニック]
 tags: [Few-shot, sample, docs]
+weight: 9
 ---
 
 エモーションプロンプトは、感情に訴えるようなプロンプトを与え、より良い回答を得る手法です。

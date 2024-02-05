@@ -2,6 +2,7 @@
 title: ⑥ 段階的に指示を与える
 categories: [基本テクニック]
 tags: [Few-shot, sample, docs]
+weight: 6
 ---
 
 複雑な指示を出したいときは一度に指示を出すのではなく、段階的に指示を与えて結果の精度を向上させます。
