@@ -1,12 +1,13 @@
 ---
-title: 数値流体解析での活用
-categories: [さらなる活用のための応用テクニック]
-tags: [Few-shot, sample, docs]
+title: 3. 数値流体解析での活用
+categories: [ソフトウエアエンジニア向け]
+tags: [CFD, Python, NumPy, Matplotlib]
+weight: 3
 ---
 
 自動車の設計ではシミュレーションを行うことがあります。そこで簡単な数値流体解析でのプロンプトの例を紹介します。
 
-### :memo: プロンプト
+### :memo: 数値計算のプロンプト
 ```text
 2次元キャビティ流れをPythonで解くためのプログラムを作成してください。結果の可視化もお願いします。
 ```
@@ -118,12 +119,7 @@ plt.show()
 ---
 なお、Visual Studio Codeを使うとJupyterNotebookでPythonコードが実行できます。
 
-![](images/cavity_flow_sample1.png)
+![](../images/cavity_flow_sample1.png)
 
-![](images/cavity_flow_sample2.png)
-
-
-> **GitHubColipotの活用**<br>
-システム開発を行うときは、「[GitHub Copilot](https://docs.github.com/ja/copilot/getting-started-with-github-copilot)」が便利です。GitHub Copilotは、AIを使ってプログラミングを支援するサービスです。
-![](images/github-copilot-sample1.png)
+![](../images/cavity_flow_sample2.png)
 

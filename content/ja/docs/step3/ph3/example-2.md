@@ -1,7 +1,8 @@
 ---
-title: REST APIの開発
-categories: [さらなる活用のための応用テクニック]
-tags: [Few-shot, sample, docs]
+title: 2. REST APIの開発
+categories: [ソフトウエアエンジニア向け]
+tags: [REST, API, Java, Python, Test, Swagger]
+weight: 2
 ---
 
 REST APIとは、RESTアーキテクチャの制約に従って、RESTful Webサービスとの対話を可能にするアプリケーション・プログラミング・インタフェース (API) です。REST (Representational State Transfer) は、コンピュータ・サイエンティストの Roy Fielding によって作成されたAPIの構築方法を定義する仕様です。REST APIは軽量で高速であるため、IoT (モノのインターネット)、モバイル・アプリケーション開発、サーバーレス・コンピューティングなどで利用されます。
@@ -9,7 +10,7 @@ REST APIとは、RESTアーキテクチャの制約に従って、RESTful Webサ
 ここでは、ChatGPTを使ってREST APIの開発を支援するためのプロンプト例を紹介します。
 
 
-### :memo: プロンプト
+### :memo: 1. JavaのSpring Frameworkを使用したRESTful APIの実装
 
 ```text
 車両の入場および出口情報を受け取り、速度違反を検出して適切なアクションを実行するためのRESTful APIを、JavaのSpring Frameworkを利用して実装してください。
@@ -41,7 +42,7 @@ REST APIとは、RESTアーキテクチャの制約に従って、RESTful Webサ
    速度違反の可能性を評価し、速度違反が検出された場合に速度違反情報をログに記録し、適切な処理を行います。
 ```
 
-### :robot: 出力例
+#### :robot: 出力例
 
 以下は、JavaのSpring Frameworkを使用して車両の入場および出口情報を処理し、速度違反を検出して適切なアクションを実行するRESTful APIのコード例です。このコードは `TrafficController` クラス内に実装されています。
 
@@ -86,7 +87,7 @@ public class TrafficController {
 ?> ChatGPTが生成したコードを詳細に確認し、実際に動作するか考えてみましょう。またChatGPTが生成したコードをそのまま利用することの危険性についても考えてみましょう。
 
 
-### :memo: プロンプト
+### :memo: 2. 既存コードの説明
 
 ```text
 次のコードを説明してください。
@@ -162,7 +163,7 @@ public class TrafficController {
 }
 ```
 
-### :robot: 出力例
+#### :robot: 出力例
 このコードは、Java言語を使用して書かれたSpring Frameworkを利用したRESTful Webサービスのコントローラークラスを示しています。このコントローラーは、交通システムに関連する情報を処理し、エンドポイントを提供します。以下は、このコードの主要な要素と役割の説明です。
 
 1. `TrafficController` クラス:
@@ -192,7 +193,7 @@ public class TrafficController {
 このコードは、車両の入場および出口情報を受け取り、速度違反を検出して適切なアクションを実行するためのRESTful APIエンドポイントを提供する簡単な交通制御システムの一部です。
 
 
-### :memo: プロンプト
+### :memo: 3. JavaからPythonへの変換
 ```text
 次のJavaのコードをFastAPIを使ってPythonに変換してください。
 
@@ -267,7 +268,7 @@ public class TrafficController {
 }
 ```
 
-### :robot: 出力例
+#### :robot: 出力例
 
 以下は、JavaからFastAPIを使用したPythonコードへの変換です。FastAPIを使用する場合、PythonコードはJavaとは異なるシンタックスとアプローチを持つことに注意してください。
 
@@ -357,7 +358,7 @@ def handlePossibleSpeedingViolation(state):
     return state
 ```
 
-### :memo: プロンプト
+### :memo: 4. OpenAPI仕様の作成
 ```text
 次のコードは車両の入場および出口情報を受け取り、速度違反を検出して適切なアクションを実行する簡単な交通制御システムの一部です。
 このコードからOpenAPI仕様を作成して下さい。
@@ -434,7 +435,7 @@ public class TrafficController {
 }
 ```
 
-### :robot: 出力例
+#### :robot: 出力例
 以下は、提供されたJavaコードからOpenAPI 3.1.0仕様を作成し、YAML形式で表現したものです。
 この仕様は、車両の入場および出口情報を受け取り、速度違反を検出して適切なアクションを実行するREST APIエンドポイントを記述しています。
 
@@ -505,9 +506,9 @@ components:
           format: date-time
 ```
 
-![](images/swagger.png)
+![](../images/swagger.png)
 
-### :memo: プロンプト
+### :memo: 5. 単体テストケース作成
 ```text
 次のコードは車両の入場および出口情報を受け取り、速度違反を検出して適切なアクションを実行する簡単な交通制御システムの一部のREST APIです。
 このコードからテストケースを作成してください。
@@ -592,7 +593,7 @@ public class TrafficController {
 ```
 
 
-### :robot: 出力例
+#### :robot: 出力例
 このコードからテストケースを作成する際に考慮すべきシナリオとテストケースのいくつかを以下に示します。テストケースは、APIの異なるエンドポイントと動作に焦点を当てることができます。
 
 1. ヘルスチェックエンドポイントのテスト:
@@ -632,12 +633,12 @@ public class TrafficController {
 これらのシナリオに基づいて、適切なテストケースを作成できます。テストケースを実行して、APIの動作を確認し、速度違反の検出などの要件をテストできます。また、エラーハンドリングや異常なケースに対するテストも行うことが重要です。
 
 
-### :memo: プロンプト
+### :memo: 6. 単体テストコード作成
 ```text
 では、このテストシナリオを検証するためのテストコード作成してください。
 ```
 
-### :robot: 出力例
+#### :robot: 出力例
 テストコードは具体的なプログラミング言語に依存する場合がありますが、以下にJavaを使用したテストコードの例を示します。
 
 ```java

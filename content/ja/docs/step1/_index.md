@@ -1,6 +1,6 @@
 ---
-title: 基本テクニック
-description: Honda様向けプロンプトエンジニアリングワークショップの資料です。
+title: 基本編
+categories: [業務利活用,ソフトウエアエンジニア向け]
 weight: 2
 ---
 

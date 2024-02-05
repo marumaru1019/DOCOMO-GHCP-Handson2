@@ -1,6 +1,5 @@
 ---
 title: 付録
-description: Honda様向けプロンプトエンジニアリングワークショップ資料
 weight: 5
 ---
 

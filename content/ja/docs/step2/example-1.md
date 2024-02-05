@@ -1,7 +1,8 @@
 ---
 title: ①メールを作成する
-categories: [日常業務で使えるテクニック]
-tags: [Few-shot, sample, docs]
+categories: [業務利活用]
+tags: [Mail,Translation]
+weight: 1
 ---
 
 メールの内容を指定することで、メールを作成することができます。

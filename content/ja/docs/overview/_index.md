@@ -1,6 +1,5 @@
 ---
 title: 事前準備
-description: HONDA様向けプロンプトエンジニアリングワークショップ資料
 weight: 1
 ---
 

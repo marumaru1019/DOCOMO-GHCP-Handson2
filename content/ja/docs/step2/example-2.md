@@ -1,7 +1,8 @@
 ---
 title: ②データフォーマットを変換する
-categories: [日常業務で使えるテクニック]
-tags: [Few-shot, sample, docs]
+categories: [業務利活用]
+tags: [Format]
+weight: 2
 ---
 
 データを任意の形式に変換したいときは、プロンプトでデータフォーマットを指定します。

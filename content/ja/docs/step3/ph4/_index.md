@@ -1,8 +1,7 @@
 ---
 title: ④資料・文章・補助作成
 description: Honda様向けプロンプトエンジニアリングワークショップ資料
-categories: [設備管理, 入門]
-tags: [test, docs]
+categories: [ソフトウエアエンジニア向け]
 weight: 4
 ---
 

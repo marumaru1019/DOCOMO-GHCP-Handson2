@@ -1,7 +1,8 @@
 ---
 title: ⑦課題点をまとめる
-categories: [日常業務で使えるテクニック]
-tags: [Few-shot, sample, docs]
+categories: [業務利活用]
+tags: [Discussion]
+weight: 7
 ---
 
 論点整理や課題点のまとめ方を学びましょう。

@@ -1,7 +1,9 @@
 ---
 title: ⑨ 感情を追加する
 categories: [基本テクニック]
-tags: [Few-shot, sample, docs]
+categories: [業務利活用,ソフトウエアエンジニア向け]
+tags: [Emotion]
+weight: 9
 ---
 
 エモーションプロンプトは、感情に訴えるようなプロンプトを与え、より良い回答を得る手法です。
@@ -19,7 +21,7 @@ tags: [Few-shot, sample, docs]
 あなたは必ずできると信じていますので、限界を超えて取り組んでいただけますか。  
 ```
 
-!> 論文[Large Language Models Understand and Can be Enhanced by Emotional Stimuli](https://arxiv.org/abs/2307.11760)では、大規模言語モデル（LLM）に感情的な刺激を加えることにより、パフォーマンスが向上するかどうかを検証しています。いくつかの異なるLLM（Flan-T5-Large、Vicuna、Llama 2、BLOOM、ChatGPT、GPT-4）を使用し、45のタスクを通じてこれらのモデルのパフォーマンスを測定しました。その結果、感情的なプロンプトを使用することで、LLMのパフォーマンスが有意に向上することが示されました。たとえば、指示誘導タスクで8.00％、BIG-Benchで115％の相対的なパフォーマンス向上が見られたとあります。
+> 論文[Large Language Models Understand and Can be Enhanced by Emotional Stimuli](https://arxiv.org/abs/2307.11760)では、大規模言語モデル（LLM）に感情的な刺激を加えることにより、パフォーマンスが向上するかどうかを検証しています。いくつかの異なるLLM（Flan-T5-Large、Vicuna、Llama 2、BLOOM、ChatGPT、GPT-4）を使用し、45のタスクを通じてこれらのモデルのパフォーマンスを測定しました。その結果、感情的なプロンプトを使用することで、LLMのパフォーマンスが有意に向上することが示されました。たとえば、指示誘導タスクで8.00％、BIG-Benchで115％の相対的なパフォーマンス向上が見られたとあります。
 
 ### :robot: 出力例
 もちろんです、私はあなたの情熱と意欲をサポートします。新しいハイブリットカーの特徴について考えてみましょう。

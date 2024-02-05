@@ -1,7 +1,8 @@
 ---
 title: ③文章を推敲する
-categories: [日常業務で使えるテクニック]
-tags: [Few-shot, sample, docs]
+categories: [業務利活用]
+tags: [Refine]
+weight: 3
 ---
 
 各種資料や論文作成時に推敲するためのテクニックを学びましょう。
