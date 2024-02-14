@@ -1,6 +1,5 @@
 ---
 title: ②情報理解
-description: Honda様向けプロンプトエンジニアリングワークショップ資料
 categories: [ソフトウエアエンジニア向け]
 tags: [Summary]
 weight: 4

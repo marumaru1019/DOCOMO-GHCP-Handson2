@@ -1,7 +1,7 @@
 ---
 title: ⑩画像を生成する
 categories: [業務利活用]
-tags: [Image]
+tags: [Image,課題発表]
 weight: 10
 ---
 

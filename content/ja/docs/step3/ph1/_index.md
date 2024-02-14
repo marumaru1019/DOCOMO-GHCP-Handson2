@@ -1,6 +1,5 @@
 ---
 title: ①情報収集
-description: HONDA様向けプロンプトエンジニアリングワークショップ資料
 categories: [ソフトウエアエンジニア向け]
 tags: [Summary, RAG]
 weight: 4
