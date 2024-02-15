@@ -19,7 +19,7 @@ xxxxxx
 
 
 {{% pageinfo %}} 
-#### :desktop_computer: 課題発表 - 5分
+#### :desktop_computer: 課題発表 - 30分
 
 ---
 今の業務で役に立ちそうな画像を生成してください。
