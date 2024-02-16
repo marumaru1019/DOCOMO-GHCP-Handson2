@@ -24,11 +24,11 @@ Github Copilot を活用することで以下のようなことが可能です�
 
 ### Github Copilot 拡張機能のインストール
 Visual Studio Code の拡張機能から Github Copilot をインストールします。
-![](images/copilot-extensions.png)
+![](../images/copilot-extensions.png)
 
 ### GIthub Copilot の有効化
 Github Copilot
-![](images/copilot-place.png)
+![](../images/copilot-place.png)
 
 ## Github Copilot でできること
 Github Copilot を用いて、単純にコードを生成するだけでなく、以下のようなことが可能です。

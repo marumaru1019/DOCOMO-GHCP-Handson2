@@ -107,14 +107,14 @@ description = "Honda様向けプロンプトエンジニアリング-入門編"
 time_format_default = "2024/01/01"
 time_format_blog = "2024/01/01"
 
-[languages.en]
-languageName ="English"
-contentDir = "content/en"
-# Weight used for sorting.
-weight = 2
-[languages.en.params]
-title = "Goldydocs"
-description = "A Docsy example site"
+# [languages.en]
+# languageName ="English"
+# contentDir = "content/en"
+# # Weight used for sorting.
+# weight = 2
+# [languages.en.params]
+# title = "Goldydocs"
+# description = "A Docsy example site"
 
 
 [markup]
