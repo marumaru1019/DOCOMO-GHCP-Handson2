@@ -5,18 +5,19 @@ tags: [Image,課題発表]
 weight: 10
 ---
 
-xxxxxx
+生成 AI を活用することで、業務で活用できる画像を生成することができます。
 
 
 ### :pen: 例題
 次のプロンプトを入力します。
 
 ```text
-
+東京で撮影された夜の首都高速を走る、白色・SUV・ホンダ・ナンバープレートが1234の車の画像を生成してください。
 ```
 
 ### :robot: 出力例
 
+![サンプル画像](../images/image-generate-sample.png)
 
 {{% pageinfo %}} 
 #### :desktop_computer: 課題発表 - 30分
