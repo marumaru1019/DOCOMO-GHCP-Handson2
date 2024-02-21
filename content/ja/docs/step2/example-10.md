@@ -32,12 +32,21 @@ Copilot (Bing Chat Enterprise) には、**会話のスタイル**という設定
 ![サンプル画像](../images/image-generate-sample.png)
 
 
-### :bulb: ヒント
+### :bulb: プロンプトと生成された画像を記録しておく
 
 生成される画像はプロンプトによって大きく異なります。
 
 プロントをどのように工夫すると期待値に近づくかを把握するために、プロンプトと生成された画像を記録しておくと良いでしょう。
 
+### :bulb: 背景をシンプルにする方法
+
+背景がシンプルな画像を生成するためには、プロンプトに `SVG画像のように背景は何も描かないでください。backgraound: transparent` という指示を追加します。
+
+```text
+赤いリンゴを画像を出力してください。その際、SVG画像のように背景は何も描かないでください。backgraound: transparent
+```
+
+<img src="../images/image-generate-sample2.png" width="200px" />
 
 {{% pageinfo %}} 
 #### :desktop_computer: 課題発表 - 30分
