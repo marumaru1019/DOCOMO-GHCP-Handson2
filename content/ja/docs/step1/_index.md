@@ -1,8 +1,8 @@
 ---
-title: 基本編
+title: 基本的な使い方
 categories: [業務利活用,技術者向け]
 weight: 2
 ---
 
 
-このパートでは、業務でChatGPTを有効に活用するための基本テクニックを紹介します。
+GitHub Copilot の基本的な使い方を解説します。

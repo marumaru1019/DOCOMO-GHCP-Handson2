@@ -1,5 +1,5 @@
 baseURL = "/"
-title = "プロンプトエンジニアリングワークショップ"
+title = "GitHub Copilot ハンズオン"
 
 
 # Language settings
@@ -137,6 +137,7 @@ section = ["HTML", "print", "RSS"]
 
 [params]
 copyright = "Microsoft"
+googleAnalytics = ""
 # privacy_policy = "https://policies.google.com/privacy"
 
 # First one is picked as the Twitter card image if not set on page.
@@ -232,4 +233,3 @@ enable = false
   [[module.imports]]
     path = "github.com/google/docsy"
     disable = false
-
