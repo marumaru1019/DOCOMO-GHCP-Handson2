@@ -1,6 +1,6 @@
 ---
 title: GitHub Copilot ハンズオン
-linkTitle: GitHub Copilot ハンズオン
+linkTitle: ハンズオン資料
 menu: {main: {weight: 10}}
 weight: 10
 url: /
