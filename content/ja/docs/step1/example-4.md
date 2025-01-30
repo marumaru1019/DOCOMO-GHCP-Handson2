@@ -26,8 +26,8 @@ weight: 4
     ![Image](https://github.com/user-attachments/assets/c04b7c03-cecc-47cf-b24d-1fb6298419f8)
 
 - ショートカットで呼び出す(VS Code 限定):
-  - **Windows**: `Ctrl+Shift+I`  
-  - **Mac**: `Cmd+Shift+I`
+  - **Windows**: `Ctrl+Alt+I`  
+  - **Mac**: `Cmd+Ctrl+I`
 
 
 
@@ -92,12 +92,13 @@ public class RandomNumberExample {
 例えば、以下のようなクラスがあるとします。
 これに対して、sumArray メソッドのロジックを改善してほしいとリクエストします。
 
-```java
+ ```java
 public class CalculationExample {
     public static int calculate(int a, int b) {
         return a + b;
     }
 
+    // **ここからsumArrayメソッド**
     public static int sumArray(int[] arr) {
         int sum = 0;
         for (int i : arr) {
@@ -105,6 +106,7 @@ public class CalculationExample {
         }
         return sum;
     }
+    // **sumArrayメソッド終了**
 }
 ```
 
