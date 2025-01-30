@@ -69,7 +69,7 @@ public class OrderService {
 
 ```text
 #file:requirements.md を踏まえて、
-UserService.java と OrderService.javaを修正してポイントシステムを追加したい。
+#file:UserService.java と #file:OrderService.javaを修正してポイントシステムを追加したい。
 どのクラスにどのフィールドやメソッドを加え、どんな作業手順になるかレベルで詳細な実装方針を出してください。
 ```
 

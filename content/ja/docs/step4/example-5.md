@@ -4,34 +4,36 @@ categories: [運用, GitHub Copilot]
 weight: 5
 ---
 
-運用現場では、**ライブラリ不足**などのコード起因だけでなく、**環境設定**や**アクセス権**のような外部要因でエラーが発生するケースが多々あります。ここでは、**Azure環境の設定ミス**が原因でアプリが起動に失敗した例をもとに、**GitHub Copilot** を使って「トラブルシュート手順書」を自動生成する流れを示します。
+運用現場では、**ライブラリ不足**などのコード起因だけでなく、**環境設定**や**アクセス権**といった外部要因によるエラーが発生することがよくあります。ここでは、**本番サーバーでの環境変数**が設定されておらずアプリが起動に失敗した例をもとに、**GitHub Copilot** を使った「トラブルシュート手順書」の作成手順を紹介します。
 
 ---
 
-### :pen: 例題
+### :pen: 例題 - 環境変数(DB_HOST)が未設定で起動失敗
 
 #### シナリオ
 
-- Javaアプリを**Azure Web App**で動かしているが、**起動時にDB接続エラー**  
-- ログ内に「**DB_HOST not set or empty**」「Unknown host 'null'」などが記録  
-- ローカルでは動くが、本番環境(Azure)でのみ落ちる → **環境変数(DB_HOST)未設定**が原因
+- **Javaアプリ**を本番サーバーで起動しようとしたところ、**DB接続エラー**が発生  
+- ログには「**DB_HOST not set or empty**」「Unknown host 'null'」というメッセージが出力  
+- ローカル環境では動くが、本番サーバーでは落ちる → つまり **DB_HOST** 環境変数が設定されていない可能性が高い
 
 ##### プロンプト例
 
 ```text
-Copilot, 下記ログと状況を参考に、環境変数が未設定でアプリが起動失敗する問題に関するトラブルシュート手順書をMarkdownで作ってください。
+Copilot, 下記ログと状況を参考に、
+環境変数が未設定でアプリが起動失敗する問題に関する
+トラブルシュート手順書をMarkdownで作ってください。
 
 ログ抜粋:
 "DB_HOST not set or empty"
 "Unknown host 'null'"
 
 状況:
-- Azure Web App上で動かすJavaアプリ
+- 本番サーバーでJavaアプリを起動中
 - DB_HOSTが設定されていない
 
 手順書には以下を含めて:
 1) 原因の概要
-2) 対処手順(Azure PortalやCLIでの設定例)
+2) 対処手順(例: Linux環境で環境変数を設定する方法)
 3) 再発防止策
 ```
 
@@ -43,63 +45,54 @@ Copilot, 下記ログと状況を参考に、環境変数が未設定でアプ�
 # トラブルシュート手順書 - 環境変数(DB_HOST)未設定による起動失敗
 
 ## 1. 原因の概要
-- アプリの起動時に `DB_HOST` 環境変数が未設定
-- ログに "DB_HOST not set or empty" とあり、DB接続先が null で失敗
+- アプリの起動時に `DB_HOST` 環境変数が設定されておらず、ログに "DB_HOST not set or empty" と記録
+- DB接続先が null 扱いとなり、接続エラーが発生
 
 ## 2. 対処手順
 
-### 2-1. Azure Portal から設定
-1. Azure Portal にログイン → 対象の Web App を選択
-2. 「Configuration」→「Application Settings」タブに移動
-3. 「New application setting」で Name: `DB_HOST`、Value: `your-db-hostname`
-4. 保存し、Web App を再起動
+### 2-1. Linux 環境での環境変数設定
+1. サーバーにSSHでログイン
+2. `~/.bashrc` などに以下を追記 (例):
+   export DB_HOST="your-db-hostname"
+3. `. ~/.bashrc` を実行して反映し、再度アプリを起動
+4. Systemd経由で起動している場合は、`/etc/systemd/system/myapp.service` に Environment設定を追加する方法も可
 
-### 2-2. Azure CLI で設定
-```bash
-az login
-az webapp config appsettings set \
-  --resource-group MyResourceGroup \
-  --name MyAppService \
-  --settings DB_HOST=your-db-hostname
-
-az webapp restart \
-  --resource-group MyResourceGroup \
-  --name MyAppService
-
-- これで `DB_HOST` が設定される → 再起動後に環境変数を読めるようになる
+### 2-2. Dockerコンテナ環境で設定する場合
+1. Docker run 時に `-e` オプションを使う:
+   docker run -e DB_HOST="your-db-hostname" -p 8080:8080 myjavaapp:latest
+2. `docker-compose.yml` を使う場合は環境変数セクションに `DB_HOST: "your-db-hostname"` を追加
 
 ### 2-3. Javaコード側の確認
-- `System.getenv("DB_HOST")` がちゃんと値を取得できるか確認
-- 必須の環境変数が無い場合、起動時にエラーを出すようにしておくと気づきやすい
+- `System.getenv("DB_HOST")` が正しく値を取得できるかログ出力
+- 必須の環境変数が無い場合は起動時にエラー表示するなどの処理を入れる
 
 ## 3. 再発防止策
-1. **環境変数チェック**:
-   - CI/CDパイプラインや起動スクリプトで必須変数をチェック
-2. **ドキュメント化**:
-   - この設定内容を運用手順書やReadmeに明記しておく
-3. **ローカルと本番の差分管理**:
-   - Local settings と本番Azure環境の設定を比較しやすいようスクリプトやIaCを整備
+1. **環境変数の事前チェック**  
+   - 起動スクリプトやCI/CDパイプラインで `DB_HOST` が設定されているか検証
+2. **ドキュメント化**  
+   - この設定内容を運用手順書やReadmeに明記し、オンボーディング時に参照
+3. **ローカルと本番の差分管理**  
+   - local-envファイルと本番サーバーの設定を比較しやすくする
 ```
 
-Copilot が**原因の概要**と**対処手順**(Azure Portal/CLI)、**再発防止策**をMarkdown形式で提案し、**トラブルシュート手順書**を素早く仕上げられます。
+Copilot は**原因の概要**と**対処手順**（例: Linuxでの環境変数設定 / Docker実行時の `-e` オプション / Java側の確認）をMarkdown形式でまとめて提案してくれます。
 
 ---
 
 ### :memo: 練習
 
-1. **別の環境要因**  
-   - 例: Firewall設定ミス、アクセス権不足 → 似た形で Copilot に手順書を作らせる  
-2. **Docker / Kubernetes**  
-   - 「KubernetesのEnv変数がunset」などに変えて同じ流れを試す  
-3. **チームドキュメントとの連携**  
-   - Copilot が出力したMarkdownをWikiやConfluenceに貼り付けて、最終調整する
-
+1. **長いログからの抜粋**  
+   - より多くのエラー行がある場合、それを含めて「ログ内容も一緒に要約して」と依頼
+2. **Pull Request で手順書をレビュー**  
+   - Copilot が作成したMarkdownをチームでレビュー＆加筆 →　Wiki などに共有
+3. **ターミナルで起きた問題をもとに手順書を作成**  
+   - 「#terminalSelection」を使い、実際に自分が行った作業をもとにトラブルシュート手順を作成させるのも有効
 ---
 
 ## まとめ
 
-- **環境変数未設定**や**Firewallミス**など、環境起因のトラブルにも、**ログ内容**＆**状況**をCopilotに渡す → **Markdownの手順書**を自動生成  
-- **Azure Portal**や**CLI**など具体的コマンドを例示 → 再発防止策も盛り込み  
-- 最終的には**人間**がレビューして内容を整え、チームで共有 → **運用**がスムーズに  
+- **環境変数未設定**などの環境起因トラブルでも、**Copilot** に「原因+ログ」を渡すと**Markdown手順書**をすばやく生成  
+- Linux環境やDockerなど、**一般的な設定手順**をコードブロック付きで提案  
+- 最終的な**内容チェック**は人間が行い、チームで合意 → 運用手順書として共有  
 
-こうして**運用フェーズ**のトラブルでも、**Copilot**を活用して**手順書作成**を効率化し、**二次トラブル**や**再発**を防げるようになります。
+こうして、運用フェーズでよくある**環境設定ミス**にも、**Copilot** を活用して**スピーディに対処手順**をまとめ、**再発防止**にも役立ちます。

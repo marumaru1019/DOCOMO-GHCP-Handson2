@@ -18,7 +18,6 @@ GitHub Copilot Chat では、**チャット参加者 (Chat Participants)**、**�
 | **@workspace**  | ワークスペース全体のファイル・依存関係を文脈として参照し、より精度の高い提案を得る |
 | **@terminal**   | ターミナルでの操作やコマンド出力を文脈として扱い、シェルコマンドやログ解析が便利   |
 | **@vscode**     | Visual Studio Codeの設定やコマンドにフォーカスしてヘルプや提案を得る           |
-| **@azure**      | Azureのサービスやデプロイに関する情報を文脈として扱う (プレビュー機能)          |
 | **@github**     | GitHubリポジトリやIssue/PRに関する文脈を優先し、操作やAPIに関する提案が可能      |
 
 ---
@@ -62,11 +61,11 @@ GitHub Copilot Chat では、**チャット参加者 (Chat Participants)**、**�
 ### 4-1. 1行で組み合わせる
 
 ```plaintext
-@workspace #file:MainController.java /fix
+@workspace /fix #file:xxx.java
 ```
 - **@workspace** … プロジェクト全体の構造を踏まえた提案  
-- **#file:MainController.java** … MainControllerだけにフォーカス  
 - **/fix** … 修正・リファクタの提案を即時に実行  
+- **#file:xxx.java** … あるJavaファイルに対する背景情報を提示  
 
 ### 4-2. 選択範囲でピンポイント修正
 
@@ -82,9 +81,9 @@ GitHub Copilot Chat では、**チャット参加者 (Chat Participants)**、**�
 ### 4-3. テスト生成を同時に依頼
 
 ```plaintext
-@workspace #file:AuthService.java /tests
+@workspace /tests #file:xxx.java
 ```
-- AuthServiceに対する**ユニットテスト**を**自動生成**  
+- あるJavaのコードに対する**ユニットテスト**を**自動生成**  
 - 大規模なファイルなら範囲選択→`#selection` でも可
 
 ---
