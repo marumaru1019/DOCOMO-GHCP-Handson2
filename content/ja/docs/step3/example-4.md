@@ -68,14 +68,14 @@ public class FileLineCounter {
 
 ---
 
-### :robot: 出力例 – Copilot による最適化サンプル
-
 #### プロンプト例
 
 ```text
 このJavaコードが遅いので、並列処理やStream APIを使った最適化案をください。
 ExecutorServiceなどを使って複数ファイルを同時に行数カウントしたいです。
 ```
+
+### :robot: 出力例 – Copilot による最適化サンプル
 
 Copilot は以下のような**並列処理**を用いた書き直しを提案してくれるかもしれません。
 

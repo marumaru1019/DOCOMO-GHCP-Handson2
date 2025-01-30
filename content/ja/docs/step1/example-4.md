@@ -14,9 +14,18 @@ weight: 4
 過去のやりとり（会話履歴）を参照しながら、**大きな文脈**でコード生成やリファクタリングを行うのに適しています。
 
 **呼び出し方法**:  
-- VS Code上部の検索窓右隣りにある「Copilot Chat」アイコンをクリック
-![Image](https://github.com/user-attachments/assets/d274ae7e-0b05-44a0-9906-6ab31faf0472)
-- ショートカットで呼び出す:  
+- VS Code
+    - VS Code上部の検索窓右隣りにある「Copilot Chat」アイコンをクリック
+- JetBrains IDE
+    - 右のサイドバーにある「Copilot Chat」アイコンをクリック
+
+    **VS Code**:
+    ![Image](https://github.com/user-attachments/assets/d274ae7e-0b05-44a0-9906-6ab31faf0472)
+
+    **JetBrains IDE**:
+    ![Image](https://github.com/user-attachments/assets/c04b7c03-cecc-47cf-b24d-1fb6298419f8)
+
+- ショートカットで呼び出す(VS Code 限定):
   - **Windows**: `Ctrl+Shift+I`  
   - **Mac**: `Cmd+Shift+I`
 
@@ -30,7 +39,12 @@ Copilot, Java 17 で
 引数: なし
 ```
 プロンプトをチャット画面の入力欄に入力し、送信すると Copilot がコードを生成してくれます。
+
+**VS Code**:
 ![Image](https://github.com/user-attachments/assets/93a96839-a116-44fe-a6a8-242ea39b18fc)
+
+**JetBrains IDE**:
+![Image](https://github.com/user-attachments/assets/038dd17d-e739-4b58-a8d6-aba7d58aa8c7)
 
 ### :robot: 出力例
 
@@ -67,8 +81,12 @@ public class RandomNumberExample {
 インラインチャットは、**選択したコードブロック**に対して、よりフォーカスした対話を行う機能です。
 
 **呼び出し方法**:  
-- **Windows/Linux**: `Ctrl+I`  
-- **Mac**: `Cmd+I`
+- **VS Code**:
+    - **Windows/Linux**: `Ctrl+I`  
+    - **Mac**: `Cmd+I`
+- **JetBrains IDE**:
+    - **WIndows/Linux**: `Shift+Ctrl+G`
+    - **Mac**: `Shift+Ctrl+I`
 
 **プロンプト例** (選択したメソッド内にフォーカス):
 例えば、以下のようなクラスがあるとします。

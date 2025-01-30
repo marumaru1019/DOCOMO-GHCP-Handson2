@@ -72,6 +72,7 @@ Copilot は**規約ファイルの内容**（クラス冒頭コメント、メ�
 ### :memo: カスタムインストラクション（プレビュー）
 
 - **カスタムインストラクション**を使うと、VS Codeや`.github/copilot-instructions.md`に**規約や独自ルール**を書いておき、常に適用させられます
+- プレビュー中の機能であり、VS Code と Visual Studio のみの Copilot Chat でサポートされています
 - 例: VS Code の `settings.json` に以下の設定を追加
   ```jsonc
   "github.copilot.chat.codeGeneration.instructions": [

@@ -23,7 +23,7 @@ GitHub Copilot の最も基本的な使用法のひとつが**コード補完**�
    ```
    これで入力を中断すると、Copilot が残りの実装を提案してくれるはずです。
 
-2. **提案の受け入れ**  
+2. **提案の受け入れ** (VS Code と JetBrains IDEs で同様の操作)
    - **Tabキー** で提案を承認  
    - **Escキー** で却下
 
@@ -45,7 +45,7 @@ public class CalculationExample {
 
 ## 複数の候補を表示する
 
-入力内容によっては、Copilot が**複数の候補**を提示することがあります。  
+入力内容によっては、Copilot が**複数の候補**を提示することがあります(VS Code と JetBrains IDEs で同様の操作)。  
 - Windows/Linux: **Alt + ]** (次の候補)、**Alt + [** (前の候補)  
 - macOS: **Option + ]** (次の候補)、**Option + [** (前の候補)
 
@@ -58,14 +58,26 @@ public class CalculationExample {
 GitHub Copilot が複数行をまとめて提案した場合、「全部はいらないけど、一部だけ取り込みたい」ことがあります。そこで**部分的な受け入れ**が可能です。
 
 1. **次の単語だけ承諾**  
-   - マウスを候補上に置くと「Accept Word」というボタンが表示される  
+   - VS Code の場合、マウスを候補上に置くと「Accept Word」というボタンが表示される
+   - JetBrains IDEs の場合、提案箇所の末尾で右クリックすると「Accept Next Word」というボタンが表示される
    - Windows/Linux なら **Ctrl + →**、macOS なら **Cmd + →** などのショートカットで行うこともできる
+
+   **VS Code の場合**
    ![Image](https://github.com/user-attachments/assets/f0caf83c-d0e8-4543-99e4-ad9e772c9fe5)
 
+   **JetBrains IDEs の場合**
+   ![Image](https://github.com/user-attachments/assets/1f7c7671-0b70-4277-a1d9-421d7c988c70)
+   
 2. **次の行だけ承諾**  
-   - マウスを候補上に置くと「Accept Line」というボタンが表示される  
-   - `editor.action.inlineSuggest.acceptNextLine` にカスタムのキーを割り当てると「この行だけ承諾」できる
+   - VS Code の場合、マウスを候補上に置くと「Accept Line」というボタンが表示される  
+   - JetBrains IDEs の場合、提案箇所の末尾で右クリックすると「Accept Next Line」というボタンが表示される
+   - VS Code の場合、`editor.action.inlineSuggest.acceptNextLine` にカスタムのキーを割り当てると「この行だけ承諾」できる
+   - JetBrains IDEs の場合、macOS では **Command + Control + →**、Windows では **Control + Alt + →** で「次の行だけ承諾」できる
+
+   **VS Code の場合**
    ![Image](https://github.com/user-attachments/assets/f8c85e30-e66e-4b3c-8cdf-a02f70fd8ab7)
+   **JetBrains IDEs の場合**
+   ![Image](https://github.com/user-attachments/assets/b78a1dd6-86fb-4b3f-99bf-a607d7c50d06)
 
 
 ---

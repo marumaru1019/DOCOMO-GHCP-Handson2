@@ -74,7 +74,12 @@ public class UserApiClient {
 
 #### Tips
 チャットの上部にある **巻き戻しマーク** をクリックすると、**過去のスレッド**を見直すことができます。これにより、一時的に新しいスレッドを開始したけど、前の文脈に戻りたいという際に便利です。
+
+**VS Code:**
 ![Image](https://github.com/user-attachments/assets/4ff69a21-97cf-4d42-b8fa-31054f86d1c1)
+
+**JetBrains IDE:**
+![Image](https://github.com/user-attachments/assets/7702b582-6695-40e9-b615-75d2ece79c8c)
 
 ### :memo: 履歴を整理する方法
 

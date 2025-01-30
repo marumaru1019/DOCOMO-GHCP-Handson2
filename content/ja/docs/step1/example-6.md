@@ -54,15 +54,25 @@ Copilot が**参照するファイル**を管理するために、**ピン留め
 
 ### 1. ピン留めの方法
 
-- **VS Code** でファイルタブを右クリック → **「Pin」** を選ぶ  
-![Image](https://github.com/user-attachments/assets/1f4f7e86-1f18-4c0c-b95d-e1f239cb3cbd)
+- **VS Code:** 
+    - ファイルタブを右クリック → **「Pin」** を選ぶ  
+    ![Image](https://github.com/user-attachments/assets/1f4f7e86-1f18-4c0c-b95d-e1f239cb3cbd)
+
+- **JetBrains IDE:** 
+    - ファイルタブを右クリック → **「タブをピン止め」** を選ぶ
+    ![Image](https://github.com/user-attachments/assets/19464978-9287-4699-ab98-a47c18e17968)
 
 ### 2. 使い方の例
 
 - **例**: `Helper.java` をピン留め  
   - Copilot はこのファイルを**文脈**として認識し続ける → `App.java` から `Helper` のメソッド呼び出しを勝手に提案  
   - 関連するファイルにもかかわらず誤って閉じてしまうことを防ぐ
-  ![Image](https://github.com/user-attachments/assets/8dd2d696-83a8-4423-b293-83d665e505f1)
+
+**VS Code:**
+![Image](https://github.com/user-attachments/assets/8dd2d696-83a8-4423-b293-83d665e505f1)
+
+**JetBrains IDE:**
+![Image](https://github.com/user-attachments/assets/0f65a630-49ba-48d9-adf9-d43b614ae472)
 
 ---
 
