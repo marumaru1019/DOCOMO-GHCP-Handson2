@@ -16,7 +16,7 @@ weight: 1
 
 ### GitHub Copilot が有効になっているか確認
 VS Code 右下にある「GitHub Copilot」アイコンをクリックして、拡張機能が有効になっていることを確認してください。
-![Image](https://github.com/user-attachments/assets/dffab4cb-0c77-47fb-8dd8-5b6bdc7bcf54)
+![Image](https://github.com/user-attachments/assets/3f06052b-28e3-41d6-8aef-946922e769c7)
 
 また、動作確認として、プロジェクト内に Sample.java などのファイルを作成し、下記のようなコメントを入力して改行してみてください。
 ```java
