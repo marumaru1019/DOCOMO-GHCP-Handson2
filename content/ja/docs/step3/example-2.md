@@ -52,9 +52,6 @@ public class BubbleSort {
 
 ```text
 #file:review.md  に沿ってコードレビューコメントを作成してください
-
-以下のファイルは下記です:
-- #file: レビューさせたいファイル
 ```
 
 ---

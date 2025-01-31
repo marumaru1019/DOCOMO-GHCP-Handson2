@@ -1,5 +1,5 @@
 ---
-title: ⑥ 隣接タブ & ピン留め
+title: ⑤ 隣接タブ & ピン留め
 categories: [技術者向け, GitHub Copilot 応用]
 weight: 6
 ---

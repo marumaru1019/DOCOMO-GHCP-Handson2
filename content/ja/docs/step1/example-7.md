@@ -1,5 +1,5 @@
 ---
-title: ⑦ コードの翻訳
+title: ⑥ コードの翻訳
 categories: [技術者向け, GitHub Copilot 応用]
 weight: 7
 ---
@@ -25,7 +25,7 @@ def add_and_square(x, y):
 #### プロンプト例
 
 ```text
-Copilot, このPythonコードをJavaに変換してください。
+このPythonコードをJavaに変換してください。
 関数名は addAndSquare にして、JavaDocコメントもつけて。
 ```
 

@@ -1,5 +1,5 @@
 ---
-title: ⑤ ショートカットコマンドの活用
+title: ➃ ショートカットコマンドの活用
 categories: [技術者向け, GitHub Copilot 応用]
 weight: 5
 ---

@@ -1,5 +1,5 @@
 ---
-title: ④ ボトルネック箇所の修正や最適化
+title: ③ ボトルネック箇所の修正や最適化
 categories: [GitHub Copilot, Engineer Usecases]
 weight: 4
 ---

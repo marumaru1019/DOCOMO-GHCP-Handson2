@@ -1,5 +1,5 @@
 ---
-title: ④ Copilot Chat
+title: ③ Copilot Chat
 categories: [技術者向け, GitHub Copilot 基本]
 weight: 4
 ---
@@ -33,7 +33,7 @@ weight: 4
 
 **プロンプト例**:
 ```text
-Copilot, Java 17 で
+Java 17 で
 1～10の乱数を返す static メソッドを作ってください。
 メソッド名: getRandomNumber
 引数: なし

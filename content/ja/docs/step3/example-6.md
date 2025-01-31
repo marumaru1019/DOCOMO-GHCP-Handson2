@@ -1,5 +1,5 @@
 ---
-title: ⑥ Swagger 定義の自動生成
+title: ⑤ Swagger 定義の自動生成
 categories: [GitHub Copilot, Engineer Usecases]
 weight: 6
 ---

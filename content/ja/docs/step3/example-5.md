@@ -1,5 +1,5 @@
 ---
-title: ⑤ コメントだけを翻訳してコードに挿入
+title: ➃ コメントだけを翻訳してコードに挿入
 categories: [GitHub Copilot, Engineer Usecases]
 weight: 5
 ---
