@@ -1,5 +1,5 @@
 ---
-title: ⑧ コードのリファクタリング
+title: ⑦ コードのリファクタリング
 categories: [技術者向け, GitHub Copilot 応用]
 weight: 8
 ---

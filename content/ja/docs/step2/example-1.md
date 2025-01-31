@@ -77,7 +77,7 @@ public class UserProfileGenerator {
 #### プロンプト例
 
 ```text
-Copilot, Spring Boot 3.x を使っています。
+Spring Boot 3.x を使っています。
 Controllerクラスを作成し、「/hello」で "Hello, Spring" を返すコードを書いてください。
 ```
 

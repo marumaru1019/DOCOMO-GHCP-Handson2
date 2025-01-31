@@ -1,5 +1,5 @@
 ---
-title: ⑦ 実装方針の策定
+title: ⑥ 実装方針の策定
 categories: [GitHub Copilot, Engineer Usecases]
 weight: 7
 ---
