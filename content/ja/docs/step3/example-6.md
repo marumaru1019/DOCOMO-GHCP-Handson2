@@ -1,5 +1,5 @@
 ---
-title: ⑤ Swagger 定義の自動生成
+title: ⑥ Swagger 定義の自動生成
 categories: [GitHub Copilot, Engineer Usecases]
 weight: 6
 ---
@@ -188,19 +188,19 @@ Copilot は**GET /api/v1/users**, **POST /api/v1/users**, **GET/PUT/DELETE /api/
 
 ### :memo: 練習
 
-1. **パラメータ追加**  
-   - コードを修正して `@GetMapping(params = "region")` 等を増やした後、「再度OpenAPI定義を生成して」と頼む  
-2. **OpenAPI Generator**  
-   - Copilot が出力した YAML を使って**クライアントSDK**を作る → Copilotに「生成した YAML でクライアントSDKを試したい」と話しかける  
-3. **大規模API**  
+1. **パラメータ追加**
+   - コードを修正して `@GetMapping(params = "region")` 等を増やした後、「再度OpenAPI定義を生成して」と頼む
+2. **OpenAPI Generator**
+   - Copilot が出力した YAML を使って**クライアントSDK**を作る → Copilotに「生成した YAML でクライアントSDKを試したい」と話しかける
+3. **大規模API**
    - 複数Controllerをまとめて `#file:` で指定し「全API分のOpenAPI書いて」と依頼 → どの程度正確に生成されるか試す
 
 ---
 
 ## まとめ
 
-- **API実装** (`UserController.java`など) を **`#file`** として読み込ませ、「Swagger 定義を作って」と伝える → **OpenAPI YAML**をCopilotが自動生成  
-- **HTTPメソッドや@PathVariable**、**RequestBody** の型などを**自動解析** → **paths** や**schema**セクションが埋まる  
-- 生成された YAML は**swagger-ui** や**OpenAPI Generator** でさらに活用可能  
+- **API実装** (`UserController.java`など) を **`#file`** として読み込ませ、「Swagger 定義を作って」と伝える → **OpenAPI YAML**をCopilotが自動生成
+- **HTTPメソッドや@PathVariable**、**RequestBody** の型などを**自動解析** → **paths** や**schema**セクションが埋まる
+- 生成された YAML は**swagger-ui** や**OpenAPI Generator** でさらに活用可能
 
 こうして**API実装→Swagger定義**の流れも、Copilotが**コード解析**をして**自動ドキュメント**化に役立つため、**開発効率**が大幅に向上します。

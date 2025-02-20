@@ -23,7 +23,7 @@ GitHub Copilot の最も基本的な使用法のひとつが**コード補完**�
    ```
    これで入力を中断すると、Copilot が残りの実装を提案してくれるはずです。
 
-2. **提案の受け入れ** (VS Code と JetBrains IDEs で同様の操作)
+2. **提案の受け入れ**
    - **Tabキー** で提案を承認  
    - **Escキー** で却下
 
@@ -45,7 +45,7 @@ public class CalculationExample {
 
 ## 複数の候補を表示する
 
-入力内容によっては、Copilot が**複数の候補**を提示することがあります(VS Code と JetBrains IDEs で同様の操作)。  
+入力内容によっては、Copilot が**複数の候補**を提示することがあります。  
 - Windows/Linux: **Alt + ]** (次の候補)、**Alt + [** (前の候補)  
 - macOS: **Option + ]** (次の候補)、**Option + [** (前の候補)
 
@@ -58,27 +58,16 @@ public class CalculationExample {
 GitHub Copilot が複数行をまとめて提案した場合、「全部はいらないけど、一部だけ取り込みたい」ことがあります。そこで**部分的な受け入れ**が可能です。
 
 1. **次の単語だけ承諾**  
-   - VS Code の場合、マウスを候補上に置くと「Accept Word」というボタンが表示される
-   - JetBrains IDEs の場合、提案箇所の末尾で右クリックすると「Accept Next Word」というボタンが表示される
-   - Windows/Linux なら **Ctrl + →**、macOS なら **Cmd + →** などのショートカットで行うこともできる
+   - マウスを候補上に置くと「Accept Word」というボタンが表示されます。
+   - Windows/Linuxでは **Ctrl + →**、macOSでは **Cmd + →** のショートカットも利用できます。
 
-   **VS Code の場合**
    ![Image](https://github.com/user-attachments/assets/f0caf83c-d0e8-4543-99e4-ad9e772c9fe5)
 
-   **JetBrains IDEs の場合**
-   ![Image](https://github.com/user-attachments/assets/1f7c7671-0b70-4277-a1d9-421d7c988c70)
-   
 2. **次の行だけ承諾**  
-   - VS Code の場合、マウスを候補上に置くと「Accept Line」というボタンが表示される  
-   - JetBrains IDEs の場合、提案箇所の末尾で右クリックすると「Accept Next Line」というボタンが表示される
-   - VS Code の場合、`editor.action.inlineSuggest.acceptNextLine` にカスタムのキーを割り当てると「この行だけ承諾」できる
-   - JetBrains IDEs の場合、macOS では **Command + Control + →**、Windows では **Control + Alt + →** で「次の行だけ承諾」できる
+   - マウスを候補上に置くと「Accept Line」というボタンが表示されます。
+   - `editor.action.inlineSuggest.acceptNextLine` にカスタムキーを割り当てることで、この行だけを受け入れることが可能です。
 
-   **VS Code の場合**
    ![Image](https://github.com/user-attachments/assets/f8c85e30-e66e-4b3c-8cdf-a02f70fd8ab7)
-   **JetBrains IDEs の場合**
-   ![Image](https://github.com/user-attachments/assets/b78a1dd6-86fb-4b3f-99bf-a607d7c50d06)
-
 
 ---
 
@@ -101,4 +90,4 @@ GitHub Copilot が複数行をまとめて提案した場合、「全部はい�
 
 - **途中までコードを書く** → Copilot が残りを推測して補完  
 - **複数の候補**があるときは、前後を切り替えてベストなものを選ぶ  
-- 必要に応じて**部分的に承諾**して不要行を飛ばせる  
+- 必要に応じて**部分的に承諾**して不要行を飛ばせる

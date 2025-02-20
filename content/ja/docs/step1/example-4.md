@@ -1,5 +1,5 @@
 ---
-title: ③ Copilot Chat
+title: ④ Copilot Chat
 categories: [技術者向け, GitHub Copilot 基本]
 weight: 4
 ---
@@ -10,24 +10,16 @@ weight: 4
 
 ### :pen: 例題 – チャットビュー
 
-チャットビューは、**VS Code のサイドバー**に表示される **Copilot Chat** ペインを使う方法です。  
+チャットビューは、**サイドバー**に表示される **Copilot Chat** ペインを使う方法です。
 過去のやりとり（会話履歴）を参照しながら、**大きな文脈**でコード生成やリファクタリングを行うのに適しています。
 
-**呼び出し方法**:  
-- VS Code
-    - VS Code上部の検索窓右隣りにある「Copilot Chat」アイコンをクリック
-- JetBrains IDE
-    - 右のサイドバーにある「Copilot Chat」アイコンをクリック
+**呼び出し方法**:
+- 上部の検索窓右隣りにある「Copilot Chat」アイコンをクリック
+![Image](https://github.com/user-attachments/assets/d274ae7e-0b05-44a0-9906-6ab31faf0472)
 
-    **VS Code**:
-    ![Image](https://github.com/user-attachments/assets/d274ae7e-0b05-44a0-9906-6ab31faf0472)
-
-    **JetBrains IDE**:
-    ![Image](https://github.com/user-attachments/assets/c04b7c03-cecc-47cf-b24d-1fb6298419f8)
-
-- ショートカットで呼び出す(VS Code 限定):
-  - **Windows**: `Ctrl+Alt+I`  
-  - **Mac**: `Cmd+Ctrl+I`
+**ショートカットで呼び出す**:
+- **Windows**: `Ctrl+Alt+I`
+- **Mac**: `Cmd+Ctrl+I`
 
 
 
@@ -40,11 +32,7 @@ Java 17 で
 ```
 プロンプトをチャット画面の入力欄に入力し、送信すると Copilot がコードを生成してくれます。
 
-**VS Code**:
 ![Image](https://github.com/user-attachments/assets/93a96839-a116-44fe-a6a8-242ea39b18fc)
-
-**JetBrains IDE**:
-![Image](https://github.com/user-attachments/assets/038dd17d-e739-4b58-a8d6-aba7d58aa8c7)
 
 ### :robot: 出力例
 
@@ -80,13 +68,10 @@ public class RandomNumberExample {
 
 インラインチャットは、**選択したコードブロック**に対して、よりフォーカスした対話を行う機能です。
 
-**呼び出し方法**:  
+**呼び出し方法**:
 - **VS Code**:
-    - **Windows/Linux**: `Ctrl+I`  
+    - **Windows/Linux**: `Ctrl+I`
     - **Mac**: `Cmd+I`
-- **JetBrains IDE**:
-    - **WIndows/Linux**: `Shift+Ctrl+G`
-    - **Mac**: `Shift+Ctrl+I`
 
 **プロンプト例** (選択したメソッド内にフォーカス):
 例えば、以下のようなクラスがあるとします。
@@ -126,7 +111,7 @@ public static int sumArray(int[] arr) {
 }
 ```
 
-**操作**:  
+**操作**:
 - インラインチャット上で提案を確認し、必要なら`Accept`ボタンをクリックしてコードを挿入
 - 不要であれば、`Discard`ボタンで提案を破棄
 - 再度生成を試す場合は、ぐるぐるアイコンをクリック
@@ -143,17 +128,17 @@ public static int sumArray(int[] arr) {
 ---
 
 ### :memo: 練習
-- 他の箇所を選択し、「コメントだけ翻訳して」「このロジックにエラー処理を追加して」など試してみる  
+- 他の箇所を選択し、「コメントだけ翻訳して」「このロジックにエラー処理を追加して」など試してみる
 - インラインチャットでコードの再提案を試してみて出力が変わるか確認する
 ---
 
 ## まとめ
 
 - **Copilot Chat**:
-  - **チャットビュー**: 大きな文脈を持った会話に向いている  
+  - **チャットビュー**: 大きな文脈を持った会話に向いている
   - 履歴を活かして「コード生成 → 追加説明 → リファクタ → テスト生成」と一連の流れをスムーズに行える
 - **インラインチャット**:
-  - **ショートカット**で呼び出し、選択中のコードブロックにピンポイントな修正依頼  
+  - **ショートカット**で呼び出し、選択中のコードブロックにピンポイントな修正依頼
   - 大きなやりとりが不要な場合や、さっと1箇所だけ補完させたいときに便利
 
 - **どちらも**自然言語でリファクタ・説明・テスト生成を頼めるが、**スコープ**や**操作感**が違うので、場面に応じて使い分けると効果的

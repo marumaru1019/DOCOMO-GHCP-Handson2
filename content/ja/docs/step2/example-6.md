@@ -11,8 +11,8 @@ weight: 6
 ### :pen: 例題
 
 #### シナリオ
-- **既存ファイルの参照**: `api_definitions.md` に大量のAPIが書かれている  
-- **特定のなユーザーAPIの使用** (`GET /api/v1/users?region={region}&includeInactive=true`) だけ使いたい  
+- **既存ファイルの参照**: `api_definitions.md` に大量のAPIが書かれている
+- **特定のなユーザーAPIの使用** (`GET /api/v1/users?region={region}&includeInactive=true`) だけ使いたい
 - **新ファイルの作成**: `UserApiClient.java` を作り、そのAPIを呼び出すロジックを実装する
 
 ##### `api_definitions.md` (一部抜粋)
@@ -44,7 +44,7 @@ weight: 6
 
 ```java
 public class UserApiClient {
-    
+
     public List<User> fetchUsersByRegion(String region, boolean includeInactive) throws IOException {
         String urlStr = String.format("https://example.com/api/v1/users?region=%s&includeInactive=%b",
                                        region, includeInactive);
@@ -68,25 +68,20 @@ public class UserApiClient {
 
 ---
 
-### :bulb: 履歴の整理
+### :bulb: Tips
 チャットの履歴に一貫性がないと、Copilot が**誤った文脈**を読み込んでしまうリスクがあります。そのため、**不要なコンテキスト**を排除し、**必要な部分**だけ提示することが重要です。
 新しく話題を始める際は、**新規チャット**を開始するか、**/clear** コマンドで履歴をリセットすることで、Copilot が**正確なコード**を生成しやすくなります。
 
-#### Tips
 チャットの上部にある **巻き戻しマーク** をクリックすると、**過去のスレッド**を見直すことができます。これにより、一時的に新しいスレッドを開始したけど、前の文脈に戻りたいという際に便利です。
 
-**VS Code:**
 ![Image](https://github.com/user-attachments/assets/4ff69a21-97cf-4d42-b8fa-31054f86d1c1)
-
-**JetBrains IDE:**
-![Image](https://github.com/user-attachments/assets/7702b582-6695-40e9-b615-75d2ece79c8c)
 
 ### :memo: 履歴を整理する方法
 
-1. **/clear コマンド**  
+1. **/clear コマンド**
    - Copilot チャットに `/clear` を入力すると新規チャットが開始されます
-2. **巻き戻しマークで整理**  
-   - 過去メッセージを削除して不要な文脈を消す 
+2. **巻き戻しマークで整理**
+   - 過去メッセージを削除して不要な文脈を消す
    - **巻き戻しマーク**をクリックして、過去のスレッドを見直す
 
 不要なコードや会話ログを Copilot が参照しないようにすると、**誤推測**が減り、**意図通り**の提案が得やすくなります。
@@ -95,6 +90,6 @@ public class UserApiClient {
 
 ## まとめ
 
-- **大量のAPI定義などがある場合**、必要な部分だけ**抜粋**または**#file**指定 → Copilot が**誤った文脈**を読み込まないようにする  
-- **履歴が膨大**だと、Copilot が混乱するリスク上昇 → **/clear** 等で履歴を整理  
+- **大量のAPI定義などがある場合**、必要な部分だけ**抜粋**または**#file**指定 → Copilot が**誤った文脈**を読み込まないようにする
+- **履歴が膨大**だと、Copilot が混乱するリスク上昇 → **/clear** 等で履歴を整理
 - このように**不要なコンテキスト**を排除し、**必要部分**だけ提示すれば、Copilot が**精度の高いコード**を提示してくれます
