@@ -10,8 +10,8 @@ weight: 2
 
 ### :pen: 例題
 
-1. **Markdownファイル** (例: `review.md`) に**レビュー項目**を書き連ねる  
-2. Copilot に **「#file review.md に沿ってコードレビューを作成して」** と依頼 → 自動生成コメントを得る  
+1. **Markdownファイル** (例: `review.md`) に**レビュー項目**を書き連ねる
+2. Copilot に **「#file review.md に沿ってコードレビューを作成して」** と依頼 → 自動生成コメントを得る
 
 #### `review.md` (チェックシート例)
 
@@ -75,20 +75,31 @@ Copilot が**チェックシート**を読み取り、対応するコメント�
 ---
 
 ### :memo: 他のレビュー支援機能
-
-1. **インラインチャットでの部分レビュー**  
-   - コードの一部を選択 → 右クリック → Copilot → "Review and Comment"  
-   - 選択範囲だけレビューコメントを生成  
+1. **インラインチャットでの部分レビュー**
+   - コードの一部を選択 → 右クリック → Copilot → "Review and Comment"
+   - 選択範囲だけレビューコメントを生成
    ![Image](https://github.com/user-attachments/assets/569bb39b-6d4f-4ed6-ba89-350c6588e256)
-2. **カスタムインストラクション**  
+2. **カスタムインストラクション**
    - `.github/copilot-instructions.md` や VS Code 設定の `"github.copilot.chat.codeGeneration.instructions"` に**レビュー項目**を記載しておけば、常にCopilotが意識してレビューコメントを提案する
-
+3. **git diff を使用して差分ベースでコードレビュー**
+   - 直前の変更を `git diff HEAD~1 HEAD` で取得し、出力内容を `#terminalSelection` を使用して参照させることで、差分ベースのレビューを行うことも可能
+   - 下記は、差分を取得してコードレビューを依頼する例
+    ```text
+    #file:review.md  に沿ってコードレビューコメントを作成してください
+    ```
+    ![Image](https://github.com/user-attachments/assets/81f34d97-df7b-4eaf-a203-30472e395b77)
 ---
+- 変更差分が多く、選択が困難な場合は `fgit diff HEAD~1 HEAD > diff_output.txt` のようにして、ファイルに出力してから `#file diff_output.txt` で参照すると良い
+- 下記は、ファイルに出力してからコードレビューを依頼する例
+    ```text
+    #file:diff_output.txt は、今回の作業での変更差分を示しています。
+    #file:review.md に沿って、変更差分をレビューしてください。
+    ```
 
 ## まとめ
 
-- **Markdown形式**のチェックリスト (例: `review.md`) を **`#file`** コマンドで参照 → Copilot が**自動レビューコメント**を生成  
-- インラインで部分的にレビューするときは「**Review and Comment**」を使う  
-- **カスタムインストラクション**（プレビュー機能）を使えば、**レビュー方針**をプロジェクト全体で共有・適用しやすい  
+- **Markdown形式**のチェックリスト (例: `review.md`) を **`#file`** コマンドで参照 → Copilot が**自動レビューコメント**を生成
+- インラインで部分的にレビューするときは「**Review and Comment**」を使う
+- **カスタムインストラクション**（プレビュー機能）を使えば、**レビュー方針**をプロジェクト全体で共有・適用しやすい
 
 こうして**事前に決めたレビュー項目**をCopilotに取り込むと、**コードレビュー**の効率が大幅に上がり、**チーム品質**を高めることができます。
