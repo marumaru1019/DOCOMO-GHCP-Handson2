@@ -14,7 +14,7 @@ weight: 1
 次のプロンプトをCopilot Chatに入力します。
 
 ```
-#workspace このプロジェクトの概要を教えてください。以下の観点で分析してください：
+#codebase このプロジェクトの概要を教えてください。以下の観点で分析してください：
 
 1. プロジェクトの目的・機能
 2. 技術スタック（フロントエンド・バックエンド・データベース）
@@ -28,7 +28,203 @@ weight: 1
 
 ### :robot: 出力例
 
-Copilot が特定機能のデータフローを分析した結果がここに表示されます。
+```:markdown
+# GHCP-TodoApp プロジェクト分析レポート
+
+## 1. プロジェクトの目的・機能
+
+### 目的
+- GitHub CopilotとNext.jsを使って構築されたモダンなTodoアプリケーション
+- 開発者の学習用・デモンストレーション用として設計
+- TypeScriptとTailwind CSSを活用したモダンなフロントエンド開発の実装例
+
+### 主要機能
+- **基本Todo管理**
+  - タスクの追加・編集・削除
+  - 完了/未完了の切り替え
+  - リアルタイムでのローカルストレージ保存
+
+- **削除確認モーダル**
+  - 誤操作防止のための削除確認ダイアログ
+  - ESCキー、バックドロップクリックでの閉じる機能
+  - アクセシビリティ対応（role, aria属性）
+
+- **高度な管理機能**
+  - 3段階の優先度設定（Low/Medium/High）
+  - ステータス管理（Todo/In-Progress/Done）
+  - 作成日時の自動記録と表示
+
+- **フィルタリング・表示機能**
+  - すべて/アクティブ/完了済みのフィルタリング
+  - 各カテゴリのタスク数表示（バッジ形式）
+  - 一括削除機能（完了済みタスク）
+
+- **UI/UX**
+  - ダークモード対応
+  - レスポンシブデザイン
+  - 絵文字を活用したコメント可視化
+
+## 2. 技術スタック
+
+### フロントエンド
+- **フレームワーク**: Next.js 15 (App Router)
+- **言語**: TypeScript (厳密な型定義)
+- **スタイリング**: Tailwind CSS 4
+- **アイコン**: Lucide React
+- **フォント**: Geist, Geist Mono
+
+### 開発・品質管理
+- **テスト**: Jest + React Testing Library
+- **リンティング**: ESLint (Next.js TypeScript 設定)
+- **パッケージマネージャー**: pnpm (推奨)
+- **ビルド**: Next.js Turbopack対応
+
+### バックエンド・データベース
+- **データ永続化**: ローカルストレージ (クライアントサイド)
+- **サーバー**: なし（完全フロントエンドアプリケーション）
+- **API**: なし（ローカル状態管理のみ）
+
+## 3. フォルダ構造とその役割
+
+src/
+├── app/                    # Next.js App Router
+│   ├── favicon.ico        # ファビコン
+│   ├── globals.css        # グローバルスタイル
+│   ├── layout.tsx         # レイアウトコンポーネント
+│   └── page.tsx           # ホームページ（TodoApp）
+├── components/            # UIコンポーネント
+│   ├── index.ts          # 全コンポーネントのエクスポート
+│   ├── shared/           # 共通コンポーネント（将来拡張用）
+│   │   └── index.ts
+│   └── list/             # Todo リスト機能コンポーネント
+│       ├── index.ts
+│       ├── DeleteConfirmModal.tsx  # 削除確認モーダル
+│       ├── TodoApp.tsx             # メインアプリケーション
+│       ├── TodoFilter.tsx          # フィルタリング機能
+│       ├── TodoInput.tsx           # タスク入力フォーム
+│       ├── TodoItem.tsx            # 個別タスクアイテム
+│       ├── TodoFilter.test.tsx     # フィルターのテスト
+│       └── TodoInput.test.tsx      # 入力のテスト
+├── lib/                   # ユーティリティ・ライブラリ
+│   └── sampleData.ts     # サンプルデータ生成
+├── types/                # 型定義
+│   ├── index.ts          # 型のエクスポート
+│   ├── shared/
+│   │   └── todo.ts       # Todo関連の共通型
+│   └── list/
+│       └── filter.ts     # フィルター型
+└── setupTests.ts         # テスト環境設定
+
+### 設定ファイル
+プロジェクトルート/
+├── package.json          # 依存関係・スクリプト
+├── tsconfig.json         # TypeScript設定
+├── next.config.ts        # Next.js設定
+├── jest.config.js        # Jest設定
+├── eslint.config.mjs     # ESLint設定
+├── postcss.config.mjs    # PostCSS設定
+└── pnpm-lock.yaml        # 依存関係ロック
+
+## 4. 主要ファイルの説明
+
+### コアコンポーネント
+- **`TodoApp.tsx`**: アプリケーションのメインコンポーネント
+  - 状態管理（todos, filter, deleteModal）
+  - ローカルストレージとの同期
+  - CRUD操作の実装
+
+- **`TodoItem.tsx`**: 個別タスクアイテム
+  - インライン編集機能
+  - 優先度・ステータスの循環変更
+  - 削除確認モーダルとの連携
+
+- **`DeleteConfirmModal.tsx`**: 削除確認モーダル
+  - アクセシビリティ対応
+  - キーボードナビゲーション
+  - モーダル外クリック検知
+
+### 型定義
+- **`todo.ts`**:
+  interface Todo {
+    id: string;
+    text: string;
+    completed: boolean;
+    createdAt: Date;
+    status?: TodoStatus;  // 'todo' | 'in-progress' | 'done'
+    priority?: Priority;  // 'low' | 'medium' | 'high'
+  }
+
+### 設定ファイル
+- **`next.config.ts`**: standalone出力、webpack最適化
+- **`jest.config.js`**: jsdom環境、TypeScript対応
+- **`globals.css`**: CSS変数、ダークモード対応
+
+## 5. 開発・ビルド・実行手順
+
+### 前提条件
+- Node.js 20.0以上
+- pnpm (推奨) または npm
+
+### セットアップ
+# 1. リポジトリクローン
+git clone <repository-url>
+cd GHCP-TodoApp
+
+# 2. 依存関係インストール
+pnpm install
+
+# 3. 開発サーバー起動
+pnpm dev
+# ブラウザで http://localhost:3000 にアクセス
+
+### 利用可能なスクリプト
+# 開発
+pnpm dev          # 開発サーバー（Turbopack使用）
+
+# テスト
+pnpm test         # 全テスト実行
+pnpm test:watch   # ウォッチモード
+
+# ビルド・デプロイ
+pnpm build        # プロダクションビルド
+pnpm start        # ビルド後の実行
+
+# 品質管理
+pnpm lint         # ESLint実行
+
+### ビルド出力
+- `output: "standalone"` により、単体実行可能なビルド
+- `.next/standalone/` に完全なアプリケーション生成
+
+## 6. 依存関係の概要
+
+### 本番依存関係
+{
+  "lucide-react": "^0.525.0",    // アイコンライブラリ
+  "next": "15.3.2",              // フレームワーク
+  "react": "^19.0.0",            // UIライブラリ
+  "react-dom": "^19.0.0"         // DOM操作
+}
+
+
+### 開発依存関係
+- **TypeScript関連**: `typescript`, `@types/*`
+- **テスト関連**: `jest`, `@testing-library/*`, `babel-jest`
+- **ビルド関連**: `@tailwindcss/postcss`, `tailwindcss`
+- **品質管理**: `eslint`, `eslint-config-next`
+
+### 特徴的な技術選択
+1. **pnpm**: 高速でディスク効率的なパッケージマネージャー
+2. **Tailwind CSS 4**: 最新版の使用
+3. **React 19**: 最新の安定版
+4. **App Router**: Next.js 15の推奨ルーティング
+
+## まとめ
+
+このプロジェクトは、モダンなフロントエンド開発のベストプラクティスを実装したTodoアプリケーションです。TypeScriptによる厳密な型安全性、Tailwind CSSによる効率的なスタイリング、comprehensive testingによる品質保証が特徴的です。
+
+単純なCRUD操作を超えて、優先度管理、ステータス追跡、削除確認などの実用的な機能を含んでおり、実際のプロダクション環境でも通用する設計思想が反映されています。
+```
 
 ---
 
