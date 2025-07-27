@@ -1,11 +1,10 @@
 ---
-title: ④ Copilot のカスタム
+title: ④ Copilot のカスタマイズ
 categories: [GitHub Copilot, Agent Mode]
 weight: 4
 ---
 
-## 1. Copilot のカスタム方法は？
-
+## 1. Copilot のカスタマイズ方法は？
 VS Code の GitHub Copilot は、**カスタム指示**や**プロンプトファイル**を使用してAIの応答をプロジェクトの要件に合わせてカスタマイズできます。毎回同じコンテキストを入力する代わりに、ファイルに保存して自動的にすべてのチャットリクエストに含めることが可能です。
 
 > **ポイント**
@@ -17,7 +16,7 @@ VS Code の GitHub Copilot は、**カスタム指示**や**プロンプトフ�
 
 ---
 
-## 2. カスタムの種類と使い分け
+## 2. カスタマイズの種類と使い分け
 
 VS Code では以下の3つの方法でCopilotをカスタマイズできます：
 
@@ -73,89 +72,26 @@ VS Code では以下の3つの方法でCopilotをカスタマイズできます�
 - **フォーマット**: 見出し、リスト、コードブロックが利用可能
 - **適用範囲**: ワークスペース全体に自動適用
 
-### 3.3 実践的な使い方
+### 3.3 導入方法
 
-### :pen: 例題
-
-基本的なカスタム指示ファイルを作成してみましょう。
+カスタム指示ファイル（`.github/copilot-instructions.md`）を作成して、プロジェクト全体のコーディング規約を設定します。
 
 ```markdown
-# TypeScript & React プロジェクトのコーディング規約
+# プロジェクトのコーディング規約
 
 ## TypeScript
 - 厳密な型定義を使用してください
-- interface よりも type エイリアスを優先してください
 - 非同期処理には async/await を使用してください
 
 ## React
-- 関数コンポーネントのみを使用してください
-- スタイルは Tailwind CSS を使用してください
-- カスタムフックでロジックを分離してください
+- 関数コンポーネントを使用してください
+- Tailwind CSS でスタイリングしてください
 
 ## テスト
-- すべての新機能にはテストを含めてください
 - Jest と React Testing Library を使用してください
 ```
 
-### :robot: 出力例
-
-カスタム指示を設定後、Copilot が以下のように応答します：
-
-**ユーザー:** 「Todoのフィルタリング機能コンポーネントを作成して」
-
-**Copilot応答:**
-```typescript
-// 📝 type エイリアスを使用した型定義
-type TodoFilter = 'all' | 'active' | 'completed';
-
-interface TodoFilterProps {
-  currentFilter: TodoFilter;
-  onFilterChange: (filter: TodoFilter) => void;
-  activeTodosCount: number;
-  completedTodosCount: number;
-  onClearCompleted: () => void;
-}
-
-// 📝 関数コンポーネントとして実装
-const TodoFilterComponent: React.FC<TodoFilterProps> = ({
-  currentFilter,
-  onFilterChange,
-  activeTodosCount,
-  completedTodosCount,
-  onClearCompleted
-}) => {
-  const filters: { key: TodoFilter; label: string }[] = [
-    { key: 'all', label: 'すべて' },
-    { key: 'active', label: 'アクティブ' },
-    { key: 'completed', label: '完了済み' },
-  ];
-
-  return (
-    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-      <div className="flex gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
-        {filters.map(({ key, label }) => (
-          <button
-            key={key}
-            onClick={() => onFilterChange(key)}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-              currentFilter === key
-                ? 'bg-white dark:bg-gray-600 text-blue-600 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            {label}
-            {key === 'active' && activeTodosCount > 0 && (
-              <span className="ml-1 px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full text-xs">
-                {activeTodosCount}
-              </span>
-            )}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-};
-```
+ファイルを保存すると、以降のすべてのチャットでこれらの指示が自動的に適用されます。
 
 > **💡 Tips: カスタム指示の自動生成**
 >
@@ -234,13 +170,11 @@ applyTo: "**/*.ts,**/*.tsx"
 | `description` | 指示ファイルの説明文 | `"TypeScript専用のコーディング指示"` |
 | `applyTo` | 自動適用するファイルのglobパターン | `"**/*.ts,**/*.tsx"` |
 
-### 4.3 実践的な使い方
+### 4.3 導入方法
 
-### :pen: 例題
+技術領域に特化したinstructionsファイルを作成します。
 
-タスク固有のinstructionsファイルを作成してみましょう。
-
-**1. テスト専用指示ファイル（`testing.instructions.md`）:**
+**テスト専用指示ファイル（`testing.instructions.md`）:**
 ```markdown
 ---
 description: "テスト作成時の指示"
@@ -251,37 +185,13 @@ applyTo: "**/*.test.ts,**/*.spec.ts"
 
 ## テストライブラリ
 - Jest と React Testing Library を使用
-- テストケースは describe と it で構造化
 
 ## テスト内容
 - 正常系と異常系の両方をテスト
 - ユーザーの操作に基づいたテストを優先
-
-## アサーション
-- toBeInTheDocument(), toHaveTextContent() などのユーザー視点のアサーションを使用
 ```
 
-**2. バックエンド専用指示ファイル（`backend.instructions.md`）:**
-```markdown
----
-description: "バックエンドAPI開発指示"
-applyTo: "**/api/**/*.ts,**/server/**/*.ts"
----
-
-# バックエンドAPI開発指示
-
-## エラーハンドリング
-- 適切なHTTPステータスコードを返す
-- エラーレスポンスは統一フォーマットを使用
-
-## バリデーション
-- 入力値の検証を必須とする
-- Zodなどのスキーマバリデーションライブラリを使用
-```
-
-**使用方法：**
-- **自動適用**: `applyTo` で指定したファイルで自動的に適用
-- **手動適用**: チャットで `Add Context > Instructions` から選択
+このファイルを保存すると、テストファイル（`.test.ts`、`.spec.ts`）を編集する際に自動的に適用されます。
 
 ---
 
@@ -348,18 +258,16 @@ ${input:componentName:コンポーネント名} コンポーネントを作成�
 | `description` | プロンプトの説明文 | `"Reactコンポーネント生成プロンプト"` |
 | `tools` | 使用可能なツール・ツールセット | `["editFiles", "runTests"]` |
 
-### 5.3 実践的な使い方
+### 5.3 導入方法
 
-### :pen: 例題
+コンポーネント作成用のプロンプトファイルを作成します。
 
-再利用可能なpromptsファイルを作成してみましょう。
-
-**1. コンポーネント生成プロンプト（`create-component.prompt.md`）:**
+**コンポーネント生成プロンプト（`create-component.prompt.md`）:**
 ```markdown
 ---
 mode: agent
 description: "Reactコンポーネント生成"
-tools: ["editFiles", "runTests"]
+tools: ["editFiles"]
 ---
 
 # React コンポーネントの生成
@@ -367,81 +275,40 @@ tools: ["editFiles", "runTests"]
 ${input:componentName:コンポーネント名} という名前でReactコンポーネントを作成してください。
 
 ## 要件
-- ${input:componentType:コンポーネントタイプ（例：form, list, modal）} として機能
 - TypeScript対応
-- styled-components使用
-- React Testing Library を使用したテストファイルも生成
-
-## ファイル構成
-- `${componentName}.tsx` - メインコンポーネント
-- `${componentName}.test.tsx` - テストファイル
-- `index.ts` - エクスポート用
+- テストファイルも生成
 ```
 
-**2. APIレビュープロンプト（`api-review.prompt.md`）:**
-```markdown
----
-mode: ask
-description: "REST APIのセキュリティレビュー"
----
+このプロンプトをチャットで `/create-component` として実行すると、コンポーネント名を入力できるダイアログが表示され、指定した名前でコンポーネントが自動生成されます。
 
-# REST API セキュリティレビュー
+### 5.4 プロンプトファイルの呼び出し方法
 
-選択されたAPIコードに対してセキュリティレビューを実行してください。
+作成したプロンプトファイルを実行するには、以下の3つの方法があります：
 
-## チェック項目
-- 入力値の検証
-- 認証・認可の実装
-- SQLインジェクション対策
-- XSS対策
-- レート制限の実装
+#### 方法1: コマンドパレットから実行
+1. **コマンドパレット**（⇧⌘P / Ctrl+Shift+P）を開く
+2. `チャット: プロンプトを実行` コマンドを選択
+3. クイックピックからプロンプトファイルを選択
 
-## 出力形式
-- **セキュリティリスク**: 発見された問題点
-- **推奨対策**: 具体的な修正方法
-- **優先度**: High/Medium/Low
+#### 方法2: チャットビューで直接実行
+チャット入力欄で `/` に続けてプロンプトファイル名を入力：
+
+```
+/create-component
 ```
 
-**実行方法：**
-1. **コマンドパレット**: `Chat: Run Prompt` → プロンプト選択
-2. **チャット内**: `/create-component` や `/api-review`
-3. **エディタ**: プロンプトファイルの再生ボタンをクリック
-
-### :robot: 出力例
-
-**プロンプト実行:**
-`/create-component` 入力後、以下のダイアログが表示：
-- コンポーネント名: `UserProfile`
-- コンポーネントタイプ: `form`
-
-**Copilot応答:**
-```typescript
-// 📝 UserProfile.tsx
-import React from 'react';
-import styled from 'styled-components';
-
-type UserProfileProps = {
-  onSubmit: (data: UserData) => void;
-  initialData?: UserData;
-};
-
-export const UserProfile: React.FC<UserProfileProps> = ({
-  onSubmit,
-  initialData
-}) => {
-  // フォーム実装
-};
-
-// 📝 UserProfile.test.tsx
-import { render, screen } from '@testing-library/react';
-import { UserProfile } from './UserProfile';
-
-describe('UserProfile', () => {
-  it('should render form fields', () => {
-    // テスト実装
-  });
-});
+**追加パラメータの指定も可能：**
 ```
+/create-component: componentName=MyButton
+```
+
+#### 方法3: エディタの再生ボタンから実行
+1. プロンプトファイルをエディタで開く
+2. エディタタイトルエリアの**再生ボタン**をクリック
+3. 現在のチャットセッションまたは新しいチャットセッションを選択
+![エディタの再生ボタン](../images/editor-play-button.png)
+
+> **💡 Tips**: エディタから実行する方法は、プロンプトファイルのテストや反復改善に特に便利です。
 
 ---
 
@@ -481,20 +348,16 @@ describe('UserProfile', () => {
 
 ### :memo: 練習
 
-1. **基本設定**: プロジェクトに `.github/copilot-instructions.md` を作成し、基本的なコーディング規約を定義してください
+1. **基本設定**: `.github/copilot-instructions.md` を作成し、基本的なコーディング規約を設定してください
 
-2. **専門指示**: 使用している技術スタック用の `.instructions.md` ファイルを作成してください
-   - TypeScript/React用
+2. **専門指示**: `.instructions.md` ファイルを作成してください
    - テスト用
-   - API用
+   - 使用している技術スタック用
 
-3. **再利用プロンプト**: よく使用するタスク用の `.prompt.md` ファイルを作成してください
+3. **再利用プロンプト**: `.prompt.md` ファイルを作成してください
    - コンポーネント作成用
-   - コードレビュー用
 
 4. **動作確認**: 作成したファイルが正しく機能することを確認してください
-   - チャットで指示が自動適用されるか
-   - プロンプトが正しく実行されるか
 
 ---
 

@@ -1,5 +1,5 @@
 ---
-title: ④ テスト実装・品質保証
+title: ④ テスト実装
 categories: [GitHub Copilot, 技術者向け]
 tags: [test, quality, jest, testing-library]
 weight: 4
@@ -9,41 +9,34 @@ GitHub Copilotを活用して効率的にテストコードを実装し、コー
 
 ---
 
-## 1. プロンプトファイルによるテスト雛形生成
+## 1. 事前準備
 
-基本的なテストコードの雛形は、プロンプトファイルを活用することで効率的に生成できます。
+### 使用するテストライブラリの概要
 
-### :pen: 例題 - テスト雛形生成用プロンプトファイルの活用
+本シナリオでは以下のテストライブラリを組み合わせて使用します：
 
-```
-#file:.github/prompts/component-test.prompt.md を参照して、DeleteConfirmModalコンポーネントのテスト雛形を生成してください。
+> **📚 テストライブラリの役割分担**
+>
+> **基盤ライブラリ：**
+> * **Jest** … テスト実行エンジン（テストの実行・結果判定・モック機能）
+>
+> **React専用ライブラリ：**
+> * **React Testing Library** … Reactコンポーネントをレンダリング・検索
+> * **@testing-library/user-event** … リアルなユーザー操作をシミュレート
+> * **@testing-library/jest-dom** … DOM要素用の便利な検証機能を追加
+>
+> **💡 連携の仕組み：** Jest がテスト全体を管理し、React Testing Library でコンポーネントを描画、user-event でユーザー操作を再現、jest-dom で結果を検証する流れになります。
 
-コンポーネント名: DeleteConfirmModal
-テストファイルパス: src/components/__tests__/DeleteConfirmModal.test.tsx
+### テスト雛形生成用プロンプトファイルの作成
 
-以下の基本テストケースを含む雛形を生成してください：
-1. レンダリングテスト
-2. プロパティによる表示制御テスト
-3. ユーザーインタラクション（ボタンクリック）テスト
-4. キーボードイベントテスト
-5. アクセシビリティ基本テスト
-```
+効率的なテスト実装のために、まずテスト雛形生成用のプロンプトファイルを作成します。
 
-### :robot: 出力例
-
-```
-実際に試してみた結果をここに記載してください
-```
-
-### プロンプトファイルの設定例
-
-`.github/prompts/component-test.prompt.md` の内容例：
+**`.github/prompts/generate-test.prompt.md`**
 
 ```markdown
 ---
 mode: agent
 description: "Reactコンポーネントテスト雛形生成"
-tools: ["createFile"]
 ---
 
 # Reactコンポーネントテスト雛形生成
@@ -80,56 +73,7 @@ ${input:componentName:コンポーネント名} のテストファイルを生�
 - 適切なimport文とsetup
 ```
 
-### :memo: プロンプトファイル活用のメリット
-
-- **一貫性**: 同じ構造のテストファイルを継続的に生成
-- **効率性**: 基本的な雛形作成時間の大幅短縮
-- **標準化**: チーム全体で統一されたテストパターン
-- **再利用性**: 異なるコンポーネントで同じプロンプトを活用
-
-> 💡 **Tips: テスト用インストラクションズファイル**
->
-> より一貫したテストを書くために、以下のファイルを作成することを推奨します：
->
-> **`.github/copilot-instructions-testing.md`**
-> ```markdown
-> ---
-> applyTo: "**/*.test.tsx,**/*.test.ts,**/*.spec.tsx,**/*.spec.ts"
-> description: "テストファイル専用のコーディングガイドライン"
-> ---
->
-> # テスト専用のコーディングガイドライン
->
-> ## テスト実装の基本方針
-> - React Testing Libraryを優先使用
-> - ユーザー視点でのテストを重視
-> - describe/itによる階層構造
-> - モックは最小限に留める
->
-> ## テストファイル構成
-> - AAA（Arrange/Act/Assert）パターンを遵守
-> - テストデータはファクトリー関数で生成
-> - 共通セットアップは beforeEach で実装
->
-> ## テストカテゴリ別ガイドライン
-> ### 正常系テスト
-> - 期待される動作の確認
-> - 典型的なユーザー操作の検証
-> - 正常なデータフローの確認
->
-> ### 異常系テスト
-> - エラーハンドリングの確認
-> - バリデーション機能の検証
-> - 予期しない状況での安全性確認
->
-> ### エッジケースの考慮
-> - 境界値テスト
-> - 空データでの動作確認
-> - 大量データでのパフォーマンス確認
-> ```
->
-> この設定により、テストファイルでCopilotを使用する際に自動的に適切なガイドラインが適用されます。
->
+このプロンプトファイルにより、一貫性のあるテストファイルを効率的に生成できます。
 
 ---
 
@@ -139,8 +83,22 @@ ${input:componentName:コンポーネント名} のテストファイルを生�
 
 ### :pen: 例題 - DeleteConfirmModalコンポーネントの単体テスト
 
+作成したプロンプトファイルを使用してテストを実装します。
+
+#### プロンプトファイルの呼び出し
+
+チャット入力欄で以下のように入力してプロンプトファイルを実行します：
+
+```markdown
+/generate-test: componentName=DeleteConfirmModal
 ```
-設計したsrc/components/DeleteConfirmModal.tsxの単体テストを実装してください。以下の要件を満たしてください：
+
+または、追加の詳細要件を指定：
+
+```markdown
+/generate-test
+
+DeleteConfirmModalコンポーネントのテストファイルを生成してください。以下の要件を満たしてください：
 
 1. **基本レンダリングテスト**
    - isOpen=trueの時にモーダルが表示される
@@ -162,8 +120,279 @@ React Testing Libraryのベストプラクティスに従い、ユーザー視�
 
 ### :robot: 出力例
 
-```
-実際に試してみた結果をここに記載してください
+```typescript
+// DeleteConfirmModal.test.tsx
+
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { DeleteConfirmModal } from '../DeleteConfirmModal';
+
+describe('DeleteConfirmModal', () => {
+  const defaultProps = {
+    isOpen: true,
+    todoTitle: 'テスト用のTodoタイトル',
+    onConfirm: jest.fn(),
+    onCancel: jest.fn(),
+  };
+
+  afterEach(() => {
+    jest.clearAllMocks();
+    // 📝 テスト後にbody要素のスタイルをリセット
+    document.body.style.overflow = 'unset';
+  });
+
+  // 📝 正常系テスト
+  describe('正常系テスト', () => {
+    it('モーダルが開いているときに正常にレンダリングされる', () => {
+      render(<DeleteConfirmModal {...defaultProps} />);
+
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(screen.getByText('削除の確認')).toBeInTheDocument();
+      expect(screen.getByText('以下のTodoを削除しますか？')).toBeInTheDocument();
+      expect(screen.getByText('テスト用のTodoタイトル')).toBeInTheDocument();
+      expect(screen.getByText('🚩 この操作は取り消せません。')).toBeInTheDocument();
+      expect(screen.getByText('キャンセル')).toBeInTheDocument();
+      expect(screen.getByText('削除する')).toBeInTheDocument();
+    });
+
+    it('isOpenがfalseのときモーダルが表示されない', () => {
+      render(<DeleteConfirmModal {...defaultProps} isOpen={false} />);
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    it('todoTitleプロパティの内容が正しく表示される', () => {
+      const customTitle = '長いタイトルのTodoアイテムテスト';
+      render(<DeleteConfirmModal {...defaultProps} todoTitle={customTitle} />);
+
+      expect(screen.getByText(customTitle)).toBeInTheDocument();
+    });
+
+    it('削除するボタンをクリックするとonConfirmが呼ばれる', async () => {
+      const user = userEvent.setup();
+      render(<DeleteConfirmModal {...defaultProps} />);
+
+      await user.click(screen.getByText('削除する'));
+
+      expect(defaultProps.onConfirm).toHaveBeenCalledTimes(1);
+    });
+
+    it('キャンセルボタンをクリックするとonCancelが呼ばれる', async () => {
+      const user = userEvent.setup();
+      render(<DeleteConfirmModal {...defaultProps} />);
+
+      await user.click(screen.getByText('キャンセル'));
+
+      expect(defaultProps.onCancel).toHaveBeenCalledTimes(1);
+    });
+
+    it('閉じるボタン（X）をクリックするとonCancelが呼ばれる', async () => {
+      const user = userEvent.setup();
+      render(<DeleteConfirmModal {...defaultProps} />);
+
+      const closeButton = screen.getByLabelText('モーダルを閉じる');
+      await user.click(closeButton);
+
+      expect(defaultProps.onCancel).toHaveBeenCalledTimes(1);
+    });
+
+    it('バックドロップをクリックするとonCancelが呼ばれる', async () => {
+      const user = userEvent.setup();
+      render(<DeleteConfirmModal {...defaultProps} />);
+
+      const backdrop = screen.getByRole('dialog');
+      await user.click(backdrop);
+
+      expect(defaultProps.onCancel).toHaveBeenCalledTimes(1);
+    });
+
+    it('モーダル内部をクリックしてもonCancelが呼ばれない', async () => {
+      const user = userEvent.setup();
+      render(<DeleteConfirmModal {...defaultProps} />);
+
+      const modalContent = screen.getByText('削除の確認');
+      await user.click(modalContent);
+
+      expect(defaultProps.onCancel).not.toHaveBeenCalled();
+    });
+
+    it('モーダル表示中にbody要素のoverflowがhiddenになる', () => {
+      render(<DeleteConfirmModal {...defaultProps} />);
+
+      expect(document.body.style.overflow).toBe('hidden');
+    });
+  });
+
+  // 📝 異常系テスト
+  describe('異常系テスト', () => {
+    it('onConfirmが未定義でもエラーが発生しない', () => {
+      const props = { ...defaultProps, onConfirm: (() => {}) as () => void };
+
+      expect(() => render(<DeleteConfirmModal {...props} />)).not.toThrow();
+    });
+
+    it('onCancelが未定義でもエラーが発生しない', () => {
+      const props = { ...defaultProps, onCancel: (() => {}) as () => void };
+
+      expect(() => render(<DeleteConfirmModal {...props} />)).not.toThrow();
+    });
+
+    it('todoTitleが空文字列でも正常にレンダリングされる', () => {
+      render(<DeleteConfirmModal {...defaultProps} todoTitle="" />);
+
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(screen.getByText('削除の確認')).toBeInTheDocument();
+    });
+
+    it('todoTitleが非常に長い文字列でも正常に表示される', () => {
+      const longTitle = 'あ'.repeat(1000);
+      render(<DeleteConfirmModal {...defaultProps} todoTitle={longTitle} />);
+
+      expect(screen.getByText(longTitle)).toBeInTheDocument();
+    });
+
+    it('特殊文字を含むtodoTitleでも正常に表示される', () => {
+      const specialTitle = '<script>alert("XSS")</script> & "quotes" & \'apostrophes\'';
+      render(<DeleteConfirmModal {...defaultProps} todoTitle={specialTitle} />);
+
+      expect(screen.getByText(specialTitle)).toBeInTheDocument();
+    });
+  });
+
+  // 📝 アクセシビリティテスト
+  describe('アクセシビリティテスト', () => {
+    it('適切なARIA属性が設定されている', () => {
+      render(<DeleteConfirmModal {...defaultProps} />);
+
+      const dialog = screen.getByRole('dialog');
+      expect(dialog).toHaveAttribute('aria-modal', 'true');
+      expect(dialog).toHaveAttribute('aria-labelledby', 'modal-title');
+    });
+
+    it('モーダルタイトルに適切なIDが設定されている', () => {
+      render(<DeleteConfirmModal {...defaultProps} />);
+
+      const title = screen.getByText('削除の確認');
+      expect(title).toHaveAttribute('id', 'modal-title');
+    });
+
+    it('閉じるボタンに適切なaria-labelが設定されている', () => {
+      render(<DeleteConfirmModal {...defaultProps} />);
+
+      const closeButton = screen.getByLabelText('モーダルを閉じる');
+      expect(closeButton).toBeInTheDocument();
+    });
+
+    it('Escapeキーでモーダルが閉じられる', async () => {
+      const user = userEvent.setup();
+      render(<DeleteConfirmModal {...defaultProps} />);
+
+      await user.keyboard('{Escape}');
+
+      expect(defaultProps.onCancel).toHaveBeenCalledTimes(1);
+    });
+
+    it('Escapeキーが複数回押されてもonCancelが適切に動作する', async () => {
+      const user = userEvent.setup();
+      render(<DeleteConfirmModal {...defaultProps} />);
+
+      await user.keyboard('{Escape}');
+      await user.keyboard('{Escape}');
+
+      expect(defaultProps.onCancel).toHaveBeenCalledTimes(2);
+    });
+
+    it('Tabキーでフォーカス移動が正常に動作する', async () => {
+      const user = userEvent.setup();
+      render(<DeleteConfirmModal {...defaultProps} />);
+
+      const closeButton = screen.getByLabelText('モーダルを閉じる');
+      const cancelButton = screen.getByText('キャンセル');
+      const confirmButton = screen.getByText('削除する');
+
+      // 📝 最初のフォーカス可能要素にフォーカス
+      closeButton.focus();
+      expect(closeButton).toHaveFocus();
+
+      // 📝 Tabキーで次の要素に移動
+      await user.tab();
+      expect(cancelButton).toHaveFocus();
+
+      await user.tab();
+      expect(confirmButton).toHaveFocus();
+
+      // 📝 Shift+Tabで前の要素に戻る
+      await user.tab({ shift: true });
+      expect(cancelButton).toHaveFocus();
+    });
+
+    it('Enterキーで削除ボタンがアクティベートされる', async () => {
+      const user = userEvent.setup();
+      render(<DeleteConfirmModal {...defaultProps} />);
+
+      const confirmButton = screen.getByText('削除する');
+      confirmButton.focus();
+
+      await user.keyboard('{Enter}');
+
+      expect(defaultProps.onConfirm).toHaveBeenCalledTimes(1);
+    });
+
+    it('Spaceキーで削除ボタンがアクティベートされる', async () => {
+      const user = userEvent.setup();
+      render(<DeleteConfirmModal {...defaultProps} />);
+
+      const confirmButton = screen.getByText('削除する');
+      confirmButton.focus();
+
+      await user.keyboard(' ');
+
+      expect(defaultProps.onConfirm).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  // 📝 状態変更の正常フロー
+  describe('状態変更の正常フロー', () => {
+    it('モーダルが閉じられた後にbody要素のスタイルがリセットされる', async () => {
+      const { rerender } = render(<DeleteConfirmModal {...defaultProps} />);
+
+      expect(document.body.style.overflow).toBe('hidden');
+
+      rerender(<DeleteConfirmModal {...defaultProps} isOpen={false} />);
+
+      await waitFor(() => {
+        expect(document.body.style.overflow).toBe('unset');
+      });
+    });
+
+    it('コンポーネントがアンマウントされた後にイベントリスナーが削除される', () => {
+      const addEventListenerSpy = jest.spyOn(document, 'addEventListener');
+      const removeEventListenerSpy = jest.spyOn(document, 'removeEventListener');
+
+      const { unmount } = render(<DeleteConfirmModal {...defaultProps} />);
+
+      expect(addEventListenerSpy).toHaveBeenCalledWith('keydown', expect.any(Function));
+
+      unmount();
+
+      expect(removeEventListenerSpy).toHaveBeenCalledWith('keydown', expect.any(Function));
+
+      addEventListenerSpy.mockRestore();
+      removeEventListenerSpy.mockRestore();
+    });
+
+    it('propsが更新されても適切に再レンダリングされる', () => {
+      const { rerender } = render(<DeleteConfirmModal {...defaultProps} />);
+
+      expect(screen.getByText('テスト用のTodoタイトル')).toBeInTheDocument();
+
+      rerender(<DeleteConfirmModal {...defaultProps} todoTitle="更新されたタイトル" />);
+
+      expect(screen.getByText('更新されたタイトル')).toBeInTheDocument();
+      expect(screen.queryByText('テスト用のTodoタイトル')).not.toBeInTheDocument();
+    });
+  });
+});
 ```
 
 ---
@@ -172,10 +401,20 @@ React Testing Libraryのベストプラクティスに従い、ユーザー視�
 
 複数のコンポーネントやAPIとの連携を含む統合テストの実装手法を学びます。
 
+> **💡 統合テストでのプロンプトファイル活用**
+>
+> 単体テスト用の`generate-test`プロンプトは**1つのコンポーネント**に特化しています。統合テストでは複数コンポーネントの連携をテストするため、以下の2つのアプローチがあります：
+>
+> **アプローチ1:** 既存プロンプトファイルの基本構造を活用
+>
+> **アプローチ2:** 直接Copilotチャットで統合テストの要件を指定
+
 ### :pen: 例題 - 削除確認フローの統合テスト
 
-```
-Example-2で設計したTodo削除確認機能の統合テストを実装してください：
+直接Copilotチャットで統合テストの要件を指定して実行します：
+
+```markdown
+TodoApp全体の削除確認フロー統合テストを実装してください。以下は複数コンポーネントが連携する統合テストです：
 
 1. **削除フロー全体のテスト**
    - TodoItemで削除ボタンをクリック
@@ -196,13 +435,629 @@ Example-2で設計したTodo削除確認機能の統合テストを実装して�
    - 正しいTodoが削除される
    - 他のTodoに影響がない
 
-MSW（Mock Service Worker）を使用してAPIをモックし、実際のユーザー操作フローをテストしてください。
 ```
 
 ### :robot: 出力例
 
-```
-実際に試してみた結果をここに記載してください
+```typescript
+// TodoApp.integration.test.tsx
+
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { TodoApp } from '../TodoApp';
+import type { Todo } from '@/types';
+
+// 📝 ローカルストレージのモック
+const mockLocalStorage = (() => {
+  let store: Record<string, string> = {};
+
+  return {
+    getItem: (key: string) => store[key] || null,
+    setItem: (key: string, value: string) => {
+      store[key] = value;
+    },
+    removeItem: (key: string) => {
+      delete store[key];
+    },
+    clear: () => {
+      store = {};
+    }
+  };
+})();
+
+Object.defineProperty(window, 'localStorage', {
+  value: mockLocalStorage
+});
+
+// 📝 crypto.randomUUIDのモック
+Object.defineProperty(global, 'crypto', {
+  value: {
+    randomUUID: () => Math.random().toString(36).substr(2, 9)
+  }
+});
+
+describe('TodoApp 削除確認フロー統合テスト', () => {
+  beforeEach(() => {
+    // 📝 各テスト前にローカルストレージをクリア
+    mockLocalStorage.clear();
+    // 📝 body要素のスタイルをリセット
+    document.body.style.overflow = 'unset';
+  });
+
+  afterEach(() => {
+    // 📝 テスト後のクリーンアップ
+    document.body.style.overflow = 'unset';
+  });
+
+  // 📝 テスト用のTodoを事前に追加するヘルパー関数
+  const addTestTodos = async (user: ReturnType<typeof userEvent.setup>) => {
+    const input = screen.getByPlaceholderText('新しいタスクを入力してください...');
+
+    // 📝 複数のTodoを追加
+    await user.type(input, '最初のタスク');
+    await user.keyboard('{Enter}');
+
+    await user.clear(input);
+    await user.type(input, '削除対象のタスク');
+    await user.keyboard('{Enter}');
+
+    await user.clear(input);
+    await user.type(input, '最後のタスク');
+    await user.keyboard('{Enter}');
+
+    // 📝 Todoが追加されるまで待機
+    await waitFor(() => {
+      expect(screen.getByText('最初のタスク')).toBeInTheDocument();
+      expect(screen.getByText('削除対象のタスク')).toBeInTheDocument();
+      expect(screen.getByText('最後のタスク')).toBeInTheDocument();
+    });
+  };
+
+  // 📝 削除フロー全体のテスト
+  describe('削除フロー全体のテスト', () => {
+    it('TodoItemで削除ボタンをクリック → DeleteConfirmModal表示 → 削除実行 → Todoリストから削除', async () => {
+      const user = userEvent.setup();
+      render(<TodoApp />);
+
+      // 📝 テスト用のTodoを追加
+      await addTestTodos(user);
+
+      // 📝 初期状態の確認（3つのTodoが存在）
+      expect(screen.getByText('最初のタスク')).toBeInTheDocument();
+      expect(screen.getByText('削除対象のタスク')).toBeInTheDocument();
+      expect(screen.getByText('最後のタスク')).toBeInTheDocument();
+
+      // 📝 「削除対象のタスク」の削除ボタンを探す
+      const deleteButtons = screen.getAllByTitle('削除');
+      expect(deleteButtons).toHaveLength(3);
+
+      // 📝 2番目のTodo（削除対象のタスク）の削除ボタンをクリック
+      await user.click(deleteButtons[1]);
+
+      // 📝 削除確認モーダルが表示されることを確認
+      await waitFor(() => {
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+        expect(screen.getByText('削除の確認')).toBeInTheDocument();
+        expect(screen.getByRole('dialog')).toHaveTextContent('削除対象のタスク');
+      });
+
+      // 📝 モーダル表示中はbody要素のoverflowがhidden
+      expect(document.body.style.overflow).toBe('hidden');
+
+      // 📝 「削除する」ボタンをクリック
+      const confirmButton = screen.getByRole('button', { name: /削除する/ });
+      await user.click(confirmButton);
+
+      // 📝 モーダルが閉じられることを確認
+      await waitFor(() => {
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      });
+
+      // 📝 body要素のoverflowがリセットされる
+      await waitFor(() => {
+        expect(document.body.style.overflow).toBe('unset');
+      });
+
+      // 📝 「削除対象のタスク」が削除され、他のTodoは残っていることを確認
+      expect(screen.queryByText('削除対象のタスク')).not.toBeInTheDocument();
+      expect(screen.getByText('最初のタスク')).toBeInTheDocument();
+      expect(screen.getByText('最後のタスク')).toBeInTheDocument();
+
+      // 📝 削除ボタンが2つになっていることを確認
+      const remainingDeleteButtons = screen.getAllByTitle('削除');
+      expect(remainingDeleteButtons).toHaveLength(2);
+    });
+
+    it('複数Todoの環境で正しいTodoが削除される', async () => {
+      const user = userEvent.setup();
+      render(<TodoApp />);
+
+      // 📝 テスト用のTodoを追加
+      await addTestTodos(user);
+
+      // 📝 初期状態の確認（3つのTodoが存在）
+      expect(screen.getByText('最初のタスク')).toBeInTheDocument();
+      expect(screen.getByText('削除対象のタスク')).toBeInTheDocument();
+      expect(screen.getByText('最後のタスク')).toBeInTheDocument();
+
+      // 📝 削除ボタンの数を確認
+      const deleteButtons = screen.getAllByTitle('削除');
+      expect(deleteButtons).toHaveLength(3);
+
+      // 📝 最初のTodoを削除
+      await user.click(deleteButtons[0]);
+
+      // 📝 削除確認モーダルが表示される
+      await waitFor(() => {
+        expect(screen.getByText('削除の確認')).toBeInTheDocument();
+      });
+
+      // 📝 削除実行
+      await user.click(screen.getByRole('button', { name: /削除する/ }));
+
+      // 📝 モーダルが閉じられることを確認
+      await waitFor(() => {
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      }, { timeout: 3000 });
+
+      // 📝 削除ボタンの数で削除を確認（より確実）
+      await waitFor(() => {
+        const remainingDeleteButtons = screen.getAllByTitle('削除');
+        expect(remainingDeleteButtons).toHaveLength(2);
+      }, { timeout: 3000 });
+
+      // 📝 残っているTodoを確認（どのTodoが削除されたかは関係なく、2つ残っていることを確認）
+      const remainingTodos = [
+        screen.queryByText('最初のタスク'),
+        screen.queryByText('削除対象のタスク'),
+        screen.queryByText('最後のタスク')
+      ].filter(Boolean);
+
+      expect(remainingTodos).toHaveLength(2);
+    }, 10000);
+
+    it('最後のTodoを削除すると空状態のメッセージが表示される', async () => {
+      const user = userEvent.setup();
+      render(<TodoApp />);
+
+      // 📝 1つだけTodoを追加
+      const input = screen.getByPlaceholderText('新しいタスクを入力してください...');
+      await user.type(input, '唯一のタスク');
+      await user.keyboard('{Enter}');
+
+      await waitFor(() => {
+        expect(screen.getByText('唯一のタスク')).toBeInTheDocument();
+      });
+
+      // 📝 削除実行
+      const deleteButton = screen.getByTitle('削除');
+      await user.click(deleteButton);
+
+      await waitFor(() => {
+        expect(screen.getByText('削除の確認')).toBeInTheDocument();
+      });
+
+      await user.click(screen.getByRole('button', { name: /削除する/ }));
+
+      // 📝 空状態のメッセージが表示される
+      await waitFor(() => {
+        expect(screen.getByText('タスクがありません。新しいタスクを追加してください。')).toBeInTheDocument();
+      });
+    });
+  });
+
+  // 📝 キャンセルフローのテスト
+  describe('キャンセルフローのテスト', () => {
+    it('削除ボタンクリック → モーダル表示 → キャンセルボタン → モーダルクローズ → Todoが残る', async () => {
+      const user = userEvent.setup();
+      render(<TodoApp />);
+
+      // 📝 テスト用のTodoを追加
+      await addTestTodos(user);
+
+      // 📝 削除ボタンをクリック
+      const deleteButtons = screen.getAllByTitle('削除');
+      await user.click(deleteButtons[1]);
+
+      // 📝 モーダル表示確認
+      await waitFor(() => {
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+        expect(screen.getByRole('dialog')).toHaveTextContent('削除対象のタスク');
+      });
+
+      // 📝 キャンセルボタンをクリック
+      const cancelButton = screen.getByText('キャンセル');
+      await user.click(cancelButton);
+
+      // 📝 モーダルが閉じられることを確認
+      await waitFor(() => {
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      });
+
+      // 📝 Todoが削除されずに残っていることを確認
+      expect(screen.getByText('最初のタスク')).toBeInTheDocument();
+      expect(screen.getByText('削除対象のタスク')).toBeInTheDocument();
+      expect(screen.getByText('最後のタスク')).toBeInTheDocument();
+
+      // 📝 削除ボタンが3つのまま
+      const remainingDeleteButtons = screen.getAllByTitle('削除');
+      expect(remainingDeleteButtons).toHaveLength(3);
+    });
+
+    it('閉じるボタン（X）でモーダルをキャンセル', async () => {
+      const user = userEvent.setup();
+      render(<TodoApp />);
+
+      // 📝 テスト用のTodoを追加
+      await addTestTodos(user);
+
+      // 📝 削除ボタンをクリック
+      const deleteButtons = screen.getAllByTitle('削除');
+      await user.click(deleteButtons[0]);
+
+      // 📝 モーダル表示確認
+      await waitFor(() => {
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+      });
+
+      // 📝 閉じるボタン（X）をクリック
+      const closeButton = screen.getByLabelText('モーダルを閉じる');
+      await user.click(closeButton);
+
+      // 📝 モーダルが閉じられることを確認
+      await waitFor(() => {
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      });
+
+      // 📝 Todoが削除されずに残っている
+      expect(screen.getByText('最初のタスク')).toBeInTheDocument();
+      expect(screen.getByText('削除対象のタスク')).toBeInTheDocument();
+      expect(screen.getByText('最後のタスク')).toBeInTheDocument();
+    });
+
+    it('バックドロップクリックでモーダルをキャンセル', async () => {
+      const user = userEvent.setup();
+      render(<TodoApp />);
+
+      // 📝 テスト用のTodoを追加
+      await addTestTodos(user);
+
+      // 📝 削除ボタンをクリック
+      const deleteButtons = screen.getAllByTitle('削除');
+      await user.click(deleteButtons[2]);
+
+      // 📝 モーダル表示確認
+      await waitFor(() => {
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+      });
+
+      // 📝 バックドロップをクリック
+      const backdrop = screen.getByRole('dialog');
+      await user.click(backdrop);
+
+      // 📝 モーダルが閉じられることを確認
+      await waitFor(() => {
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      });
+
+      // 📝 Todoが削除されずに残っている
+      expect(screen.getByText('最初のタスク')).toBeInTheDocument();
+      expect(screen.getByText('削除対象のタスク')).toBeInTheDocument();
+      expect(screen.getByText('最後のタスク')).toBeInTheDocument();
+    });
+  });
+
+  // 📝 キーボード操作のテスト
+  describe('キーボード操作のテスト', () => {
+    it('ESCキーでモーダルを閉じる', async () => {
+      const user = userEvent.setup();
+      render(<TodoApp />);
+
+      // 📝 テスト用のTodoを追加
+      await addTestTodos(user);
+
+      // 📝 削除ボタンをクリック
+      const deleteButtons = screen.getAllByTitle('削除');
+      await user.click(deleteButtons[1]);
+
+      // 📝 モーダル表示確認
+      await waitFor(() => {
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+      });
+
+      // 📝 ESCキーを押す
+      await user.keyboard('{Escape}');
+
+      // 📝 モーダルが閉じられることを確認
+      await waitFor(() => {
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      });
+
+      // 📝 Todoが削除されずに残っている
+      expect(screen.getByText('最初のタスク')).toBeInTheDocument();
+      expect(screen.getByText('削除対象のタスク')).toBeInTheDocument();
+      expect(screen.getByText('最後のタスク')).toBeInTheDocument();
+    });
+
+    it('Enterキーで削除実行（削除ボタンにフォーカス時）', async () => {
+      const user = userEvent.setup();
+      render(<TodoApp />);
+
+      // 📝 テスト用のTodoを追加
+      await addTestTodos(user);
+
+      // 📝 削除ボタンをクリック
+      const deleteButtons = screen.getAllByTitle('削除');
+      await user.click(deleteButtons[1]);
+
+      // 📝 モーダル表示確認
+      await waitFor(() => {
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+      });
+
+      // 📝 削除ボタンにフォーカスを当てる
+      const confirmButton = screen.getByRole('button', { name: /削除する/ });
+      confirmButton.focus();
+      expect(confirmButton).toHaveFocus();
+
+      // 📝 Enterキーで削除実行
+      await user.keyboard('{Enter}');
+
+      // 📝 モーダルが閉じられ、Todoが削除される
+      await waitFor(() => {
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+        expect(screen.queryByText('削除対象のタスク')).not.toBeInTheDocument();
+      });
+
+      // 📝 他のTodoは残っている
+      expect(screen.getByText('最初のタスク')).toBeInTheDocument();
+      expect(screen.getByText('最後のタスク')).toBeInTheDocument();
+    });
+
+    it('Spaceキーで削除実行（削除ボタンにフォーカス時）', async () => {
+      const user = userEvent.setup();
+      render(<TodoApp />);
+
+      // 📝 テスト用のTodoを追加
+      await addTestTodos(user);
+
+      // 📝 削除ボタンをクリック
+      const deleteButtons = screen.getAllByTitle('削除');
+      await user.click(deleteButtons[0]);
+
+      // 📝 モーダル表示確認
+      await waitFor(() => {
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+      });
+
+      // 📝 削除ボタンにフォーカスを当てる
+      const confirmButton = screen.getByRole('button', { name: /削除する/ });
+      confirmButton.focus();
+
+      // 📝 Spaceキーで削除実行
+      await user.keyboard(' ');
+
+      // 📝 モーダルが閉じられることを先に確認
+      await waitFor(() => {
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      }, { timeout: 3000 });
+
+      // 📝 削除ボタンの数で削除を確認（より確実）
+      await waitFor(() => {
+        const remainingDeleteButtons = screen.getAllByTitle('削除');
+        expect(remainingDeleteButtons).toHaveLength(2);
+      }, { timeout: 3000 });
+
+      // 📝 残っているTodoを確認（どのTodoが削除されたかは関係なく、2つ残っていることを確認）
+      const remainingTodos = [
+        screen.queryByText('最初のタスク'),
+        screen.queryByText('削除対象のタスク'),
+        screen.queryByText('最後のタスク')
+      ].filter(Boolean);
+
+      expect(remainingTodos).toHaveLength(2);
+    }, 10000);
+
+    it('Tabキーでフォーカス移動が正常に動作する', async () => {
+      const user = userEvent.setup();
+      render(<TodoApp />);
+
+      // 📝 テスト用のTodoを追加
+      await addTestTodos(user);
+
+      // 📝 削除ボタンをクリック
+      const deleteButtons = screen.getAllByTitle('削除');
+      await user.click(deleteButtons[1]);
+
+      // 📝 モーダル表示確認
+      await waitFor(() => {
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+      });
+
+      // 📝 フォーカス可能な要素を取得
+      const closeButton = screen.getByLabelText('モーダルを閉じる');
+      const cancelButton = screen.getByText('キャンセル');
+      const confirmButton = screen.getByRole('button', { name: /削除する/ });
+
+      // 📝 最初のフォーカス可能要素にフォーカス
+      closeButton.focus();
+      expect(closeButton).toHaveFocus();
+
+      // 📝 Tabキーで移動
+      await user.tab();
+      expect(cancelButton).toHaveFocus();
+
+      await user.tab();
+      expect(confirmButton).toHaveFocus();
+
+      // 📝 Shift+Tabで戻る
+      await user.tab({ shift: true });
+      expect(cancelButton).toHaveFocus();
+    });
+  });
+
+  // 📝 エラーハンドリングと特殊ケース
+  describe('エラーハンドリングと特殊ケース', () => {
+    it('非常に長いタイトルのTodoでも削除フローが正常動作する', async () => {
+      const user = userEvent.setup();
+      render(<TodoApp />);
+
+      // 📝 非常に長いタイトルのTodoを追加
+      const longTitle = 'あ'.repeat(200);
+      const input = screen.getByPlaceholderText('新しいタスクを入力してください...');
+      await user.type(input, longTitle);
+      await user.keyboard('{Enter}');
+
+      await waitFor(() => {
+        expect(screen.getByText(longTitle)).toBeInTheDocument();
+      });
+
+      // 📝 削除フロー実行
+      const deleteButton = screen.getByTitle('削除');
+      await user.click(deleteButton);
+
+      await waitFor(() => {
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+        expect(screen.getByRole('dialog')).toHaveTextContent(longTitle);
+      });
+
+      await user.click(screen.getByRole('button', { name: /削除する/ }));
+
+      await waitFor(() => {
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+        expect(screen.queryByText(longTitle)).not.toBeInTheDocument();
+      });
+    });
+
+    it('特殊文字を含むタイトルのTodoでも削除フローが正常動作する', async () => {
+      const user = userEvent.setup();
+      render(<TodoApp />);
+
+      // 📝 特殊文字を含むタイトルのTodoを追加
+      const specialTitle = '<script>alert("XSS")</script> & "quotes" & \'apostrophes\'';
+      const input = screen.getByPlaceholderText('新しいタスクを入力してください...');
+      await user.type(input, specialTitle);
+      await user.keyboard('{Enter}');
+
+      await waitFor(() => {
+        expect(screen.getByText(specialTitle)).toBeInTheDocument();
+      });
+
+      // 📝 削除フロー実行
+      const deleteButton = screen.getByTitle('削除');
+      await user.click(deleteButton);
+
+      await waitFor(() => {
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+        expect(screen.getByRole('dialog')).toHaveTextContent(specialTitle);
+      });
+
+      await user.click(screen.getByRole('button', { name: /削除する/ }));
+
+      await waitFor(() => {
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+        expect(screen.queryByText(specialTitle)).not.toBeInTheDocument();
+      });
+    });
+
+    it('連続して複数のTodoを削除する', async () => {
+      const user = userEvent.setup();
+      render(<TodoApp />);
+
+      // 📝 テスト用のTodoを追加
+      await addTestTodos(user);
+
+      // 📝 1つ目を削除
+      let deleteButtons = screen.getAllByTitle('削除');
+      await user.click(deleteButtons[0]);
+
+      await waitFor(() => {
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+      });
+
+      await user.click(screen.getByRole('button', { name: /削除する/ }));
+
+      // 📝 モーダルが閉じられることを先に確認
+      await waitFor(() => {
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      }, { timeout: 3000 });
+
+      // 📝 削除ボタンの数で削除を確認（より確実）
+      await waitFor(() => {
+        const remainingDeleteButtons = screen.getAllByTitle('削除');
+        expect(remainingDeleteButtons).toHaveLength(2);
+      }, { timeout: 3000 });
+
+      // 📝 2つ目を削除
+      deleteButtons = screen.getAllByTitle('削除');
+      expect(deleteButtons).toHaveLength(2);
+
+      await user.click(deleteButtons[0]);
+
+      await waitFor(() => {
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+      });
+
+      await user.click(screen.getByRole('button', { name: /削除する/ }));
+
+      await waitFor(() => {
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      });
+
+      // 📝 最後のTodoだけが残っている
+      await waitFor(() => {
+        const finalDeleteButtons = screen.getAllByTitle('削除');
+        expect(finalDeleteButtons).toHaveLength(1);
+      }, { timeout: 3000 });
+
+      // 📝 少なくとも1つのTodoが残っていることを確認
+      const remainingTodos = [
+        screen.queryByText('最初のタスク'),
+        screen.queryByText('削除対象のタスク'),
+        screen.queryByText('最後のタスク')
+      ].filter(Boolean);
+
+      expect(remainingTodos).toHaveLength(1);
+    }, 15000);
+  });
+
+  // 📝 ローカルストレージとの統合テスト
+  describe('ローカルストレージとの統合テスト', () => {
+    it('削除後の状態がローカルストレージに保存される', async () => {
+      const user = userEvent.setup();
+      render(<TodoApp />);
+
+      // 📝 テスト用のTodoを追加
+      await addTestTodos(user);
+
+      // 📝 削除実行
+      const deleteButtons = screen.getAllByTitle('削除');
+      await user.click(deleteButtons[1]);
+
+      await waitFor(() => {
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+      });
+
+      await user.click(screen.getByRole('button', { name: /削除する/ }));
+
+      await waitFor(() => {
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+        expect(screen.queryByText('削除対象のタスク')).not.toBeInTheDocument();
+      });
+
+      // 📝 ローカルストレージの内容を確認
+      const storedTodos = mockLocalStorage.getItem('todos');
+      expect(storedTodos).toBeTruthy();
+
+      const parsedTodos = JSON.parse(storedTodos!) as Todo[];
+      expect(parsedTodos).toHaveLength(2);
+      expect(parsedTodos.some((todo: Todo) => todo.text === '削除対象のタスク')).toBe(false);
+      expect(parsedTodos.some((todo: Todo) => todo.text === '最初のタスク')).toBe(true);
+      expect(parsedTodos.some((todo: Todo) => todo.text === '最後のタスク')).toBe(true);
+    });
+  });
+});
+
 ```
 
 ---
@@ -213,7 +1068,7 @@ MSW（Mock Service Worker）を使用してAPIをモックし、実際のユー�
 
 ### :pen: 例題 - カバレッジ分析と改善
 
-```
+```markdown
 GHCP-TodoAppプロジェクトのテストカバレッジを分析し、改善提案をしてください：
 
 1. 現在のカバレッジレポートの解析
@@ -226,111 +1081,39 @@ GHCP-TodoAppプロジェクトのテストカバレッジを分析し、改善�
 jest --coverage等を使用したカバレッジ分析と改善手順を具体的に示してください。
 ```
 
-### :robot: 出力例
-
-```
-実際に試してみた結果をここに記載してください
-```
+これを実行することで、テストカバレッジのレポートが生成され、どの部分が十分にテストされていないかを視覚的に把握できます。
 
 ---
 
-## 5. 練習
+## :memo: 練習
 
-以下の練習問題に取り組んで、テスト実装のスキルを向上させましょう。GHCP-TodoAppプロジェクトを使用して実際に試してみてください。
+1. **プロンプトファイルの作成と活用**
+   - テスト雛形生成用プロンプトファイルの作成
+   - プロンプトファイルを使用したテスト実装
+   - プロジェクト固有のテストパターンの標準化
 
-### 基本練習（初級）
+2. **単体テストの実装**
+   - DeleteConfirmModalコンポーネントのテスト
+   - React Testing Libraryの基本的な使用方法の習得
+   - アクセシビリティテストの実装
 
-1. **プロンプトファイルの基本活用**
-   - component-test.prompt.mdを使用してテスト雛形を生成する
-   - 生成された雛形を理解し、基本的なテストケースを実装する
+3. **統合テストの実装**
+   - 削除確認フローの統合テスト
+   - 複数コンポーネント間の連携テスト
 
-2. **削除確認モーダルの基本テスト**
-   - DeleteConfirmModalコンポーネントの単体テストを作成する
-   - React Testing Libraryの基本的な使用方法を習得する
+4. **テストカバレッジの最適化**
+   - カバレッジ分析と改善提案
+   - 効率的なテスト追加戦略
+   - CI/CDでのカバレッジ監視設定
 
-3. **インストラクションズファイルの作成**
-   - テスト専用の.github/copilot-instructions-testing.mdを作成する
-   - プロジェクト固有のテストガイドラインを定義する
-
-### 中級練習
-
-4. **削除確認フローの統合テスト**
-   - TodoItem → DeleteConfirmModal → Todo削除の一連のフローテストを実装する
-   - 複数コンポーネント間の連携テストを作成する
-
-5. **非同期処理のテスト**
-   - 削除API通信を含むコンポーネントのテストを実装する
-   - MSWを使用したAPIモックの作成と活用
-
-6. **モーダルのアクセシビリティテスト**
-   - フォーカス管理とキーボード操作のテストを実装する
-   - ARIA属性の適切な設定をテストする
-
-### 上級練習
-
-7. **プロンプトファイルのカスタマイズ**
-   - 独自のテスト雛形生成用プロンプトファイルを作成する
-   - プロジェクト固有のテストパターンに対応したプロンプトを設計
-
-8. **削除機能のパフォーマンステスト**
-   - モーダル表示・非表示のレンダリングパフォーマンステストを実装する
-   - 大量Todoでの削除操作パフォーマンス測定
-
-9. **削除機能のテストカバレッジ最適化**
-   - 削除確認モーダル関連コードのカバレッジ不足箇所を特定
-   - 効率的なテスト追加と改善計画の策定
-
-### 実践練習
-
-10. **テスト戦略の策定**
-    - プロジェクト全体のテスト戦略ドキュメントを作成する
-    - テストピラミッドに基づいた適切なテスト配分の計画
-
-11. **プロンプトファイルライブラリの構築**
-    - 様々なコンポーネントタイプ用のプロンプトファイルセットを作成する
-    - チーム全体で再利用可能なテストテンプレート集を構築
-
-12. **テストデータ管理**
-    - テスト用のフィクスチャとファクトリーパターンを実装する
-    - テストデータの再利用と保守性の向上
-
-### 総合練習
-
-13. **包括的テスト設計**
-    - テストカバレッジやコード品質の基準を設定する
-    - 品質基準を満たすためのテスト実装計画を策定
-
-14. **テストのリファクタリング**
-    - 既存テストの重複排除と再構成を行う
-    - テストの保守性とパフォーマンス向上
-
-15. **包括的テスト計画**
-    - 新機能追加時のテスト計画策定から実装までの一連の流れを実践する
-    - プロンプトファイルを活用したテスト開発プロセスの確立
+> テスト実装の効率化により、品質保証と開発速度の両方を向上させることができます。プロンプトファイルを活用して一貫性のあるテストパターンを確立し、継続的な品質改善を実現しましょう。
 
 ---
 
-## 6. まとめ
+## まとめ
 
-GitHub Copilotを活用することで、テスト実装の効率と品質を大幅に向上できます：
-
-### 習得したスキル
-- **プロジェクト概要把握**: 既存テスト戦略の理解とカバレッジ分析
-- **個別ファイル把握**: コンポーネント・機能単位のテスト設計
-- **実装パターン調査**: 一貫したテストパターンの適用
-- **単体テスト**: React Testing Libraryを使用した効率的なテスト実装
-- **統合テスト**: MSWを活用したAPI連携テスト
-- **プロンプトファイル活用**: テスト雛形の効率的な生成
-- **テストカバレッジ最適化**: 包括的な品質管理
-
-### 実践でのメリット
-- **品質保証の自動化**: 手動テストからの脱却
-- **リグレッション防止**: 継続的な品質監視
-- **開発効率向上**: プロンプトファイルによるテスト実装時間の短縮
-- **コードの信頼性向上**: 包括的なテストカバレッジ
-- **チーム全体の品質意識向上**: 統一されたテスト戦略とプロンプトファイル
-
-### 次のステップ
-- **Example-5**: 削除確認モーダルも含めたコードレビュー自動化を学習
-- **実践応用**: Example-2で設計した機能のテスト戦略策定と実行
-- **チーム共有**: 削除確認機能のテストベストプラクティスとプロンプトファイルの横展開
+* **プロンプトファイルによるテスト雛形の効率的な生成**
+* **React Testing Libraryを使用した単体テスト実装**
+* **複数コンポーネント連携の統合テスト実装**
+* **MSWを活用したAPIモック環境でのテスト**
+* **テストカバレッジ分析による品質向上戦略**

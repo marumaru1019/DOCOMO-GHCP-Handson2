@@ -3,8 +3,9 @@
  categories: [事前準備]
  weight: 1
 ---
-本ハンズオンでは、VS Code と GitHub Copilot の拡張機能が使用できる必要があります。
-基本的に説明は VS Code をベースに行います。
+本ハンズオンでは、VS Code と GitHub Copilot の拡張機能を使用して、カスタム指示、エージェントモードなどの応用的な機能を学習します。
+実際のTodoアプリケーション（GHCP-TodoApp）をベースに、新機能の設計・実装・テストという実践的な開発フローを通じて、GitHub Copilotを効果的に活用する手法を身につけます。
+VS Code の GitHub Copilot 拡張機能が利用できる環境が必要です。
 
 ## 前提条件
 
