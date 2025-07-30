@@ -47,21 +47,13 @@ flowchart LR
 
 ## 3. 導入前の設定
 
-`settings.json` へ次の設定を追加いただくだけでご利用になれます。
+`settings.json` へ次の設定を追加するだけで利用できます。
 
 ```jsonc
 {
-  "chat.agent.enabled": true,
-  "github.copilot.chat.agent.autoFix": true // 推奨
+  "chat.agent.enabled": true
 }
 ```
-
-必要に応じて以下もご調整ください。
-
-| 設定キー                                 | 役割                               | 推奨値  |
-| ------------------------------------ | -------------------------------- | ---- |
-| `chat.agent.maxRequests`             | 1 リクエスト内の最大試行回数                  | 10   |
-| `github.copilot.chat.agent.runTasks` | `tasks.json` の build / test 自動実行 | true |
 
 ---
 

@@ -1,12 +1,7 @@
 ---
-title: 付録
-weight: 6
+title: 実践演習
+categories: [業務利活用,技術者向け]
+weight: 4
 ---
 
-本ワークショップの内容をさらに深く知るための情報をまとめました。
-
-+ [GitHub Copilot のドキュメント](https://docs.github.com/en/copilot)
-+ [Copilot Chat クックブック](https://docs.github.com/ja/copilot/tutorials/copilot-chat-cookbook)
-+ [GitHub Copilot のチートシート](https://code.visualstudio.com/docs/copilot/reference/copilot-vscode-features)
-+ [VS Code の アップデート情報](https://code.visualstudio.com/updates)
-+ [Awesome GitHub Copilot](https://github.com/github/awesome-copilot?tab=readme-ov-file)
+Step1（GitHub Copilot高度機能）とStep2（実践的開発フロー）で学んだスキルを統合し、実際の開発現場で遭遇する課題を解決する演習を行います。エージェントモード、プロンプトファイル、`#codebase`等の高度機能を組み合わせて、難易度1〜5の段階的な問題に挑戦し、実務レベルの開発力を身につけます。
