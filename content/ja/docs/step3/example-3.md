@@ -12,22 +12,19 @@ weight: 3
 ### 📋 事前準備手順
 
 ```bash
-# 1. add-search ブランチをチェックアウト
-git checkout -b add-search
-
-# 2. 最新の変更を取得
-git pull origin add-search
-
-# 3. main ブランチに切り替え
+# 1. main ブランチにいることを確認
 git checkout main
 
-# 4. add-search ブランチをマージ
-git merge add-search
+# 2. 最新のリモート情報を取得
+git fetch origin
 
-# 5. 依存関係のインストール
+# 3. add-search ブランチの内容を main にマージ
+git merge origin/add-search
+
+# 4. 依存関係のインストール
 npm install
 
-# 6. 開発サーバーを起動して検索ページが利用可能か確認
+# 5. 開発サーバーを起動して検索ページが利用可能か確認
 npm run dev
 # ブラウザで http://localhost:3000/search にアクセスして検索ページが表示されることを確認
 ```

@@ -137,7 +137,8 @@ section = ["HTML", "print", "RSS"]
 
 [params]
 copyright = "Microsoft"
-googleAnalytics = ""
+# Google Analytics無効化
+disableKinds = ["RSS"]
 # privacy_policy = "https://policies.google.com/privacy"
 
 # First one is picked as the Twitter card image if not set on page.

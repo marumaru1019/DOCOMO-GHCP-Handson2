@@ -1,0 +1,24 @@
+{{- /* This file is used to override the default head partial from Docsy theme */ -}}
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+{{ hugo.Generator }}
+{{ range .AlternativeOutputFormats -}}
+<link rel="{{ .Rel }}" type="{{ .MediaType.Type }}" href="{{ .RelPermalink | safeURL }}">
+{{ end -}}
+{{ partialCached "favicons.html" . }}
+<title>{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ with .Title }}{{ . }} | {{ end }}{{ .Site.Title }}{{ end }}</title>
+{{ $options := (dict "targetPath" "scss/main.css" "enableSourceMap" (not hugo.IsProduction)) }}
+{{ if .Site.Params.prism_syntax_highlighting }}
+{{ $scss := resources.Get "scss/main.scss" | resources.ExecuteAsTemplate "main_rendered.scss" . | resources.ToCSS $options }}
+{{ if hugo.IsProduction}}
+{{ $scss = $scss | resources.Minify | resources.Fingerprint }}
+{{ end }}
+<link href="{{ $scss.RelPermalink }}" rel="stylesheet">
+{{ else }}
+{{ $scss := resources.Get "scss/main.scss" | resources.ExecuteAsTemplate "main_rendered.scss" . | resources.ToCSS $options }}
+{{ if hugo.IsProduction}}
+{{ $scss = $scss | resources.Minify | resources.Fingerprint }}
+{{ end }}
+<link href="{{ $scss.RelPermalink }}" rel="stylesheet">
+{{ end }}
+{{ partialCached "hooks/head-end.html" . }}

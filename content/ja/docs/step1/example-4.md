@@ -226,9 +226,9 @@ applyTo: "**/*.test.ts,**/*.spec.ts"
 ```markdown
 ---
 mode: agent
-model: gpt-4
+model: GPT-4.1
 description: "Reactコンポーネント生成プロンプト"
-tools: ["editFiles", "runTests"]
+tools: ["editFiles", "runTests", "codebase"]
 ---
 
 # React コンポーネントの生成
@@ -266,20 +266,21 @@ ${input:componentName:コンポーネント名} コンポーネントを作成�
 ```markdown
 ---
 mode: agent
-description: "Reactコンポーネント生成"
-tools: ["editFiles"]
+model: GPT-4.1
+description: "Reactコンポーネント生成プロンプト"
+tools: ["editFiles", "runTests", "codebase"]
 ---
 
 # React コンポーネントの生成
 
-${input:componentName:コンポーネント名} という名前でReactコンポーネントを作成してください。
+${input:componentName:コンポーネント名} コンポーネントを作成してください。
 
 ## 要件
 - TypeScript対応
+- styled-components使用
 - テストファイルも生成
-```
 
-このプロンプトをチャットで `/create-component` として実行すると、コンポーネント名を入力できるダイアログが表示され、指定した名前でコンポーネントが自動生成されます。
+```
 
 ### 5.4 プロンプトファイルの呼び出し方法
 
