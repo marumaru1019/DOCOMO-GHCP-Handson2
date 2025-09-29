@@ -13,11 +13,11 @@ weight: 1
 
 次のプロンプトをCopilot Chatに入力します。
 
-```
+```markdown
 #codebase このプロジェクトの概要を教えてください。以下の観点で分析してください：
 
 1. プロジェクトの目的・機能
-2. 技術スタック（フロントエンド・バックエンド・データベース）
+2. 技術スタック
 3. フォルダ構造とその役割
 4. 主要なファイルの説明
 5. 開発・ビルド・実行手順
@@ -33,8 +33,9 @@ weight: 1
 
 ## 1. プロジェクトの目的・機能
 
-### 目的
-- GitHub CopilotとNext.jsを使って構築されたモダンなTodoアプリケーション
+#---
+
+## 2. 特定実装の場所特定lotとNext.jsを使って構築されたモダンなTodoアプリケーション
 - 開発者の学習用・デモンストレーション用として設計
 - TypeScriptとTailwind CSSを活用したモダンなフロントエンド開発の実装例
 
@@ -228,488 +229,13 @@ pnpm lint         # ESLint実行
 
 ---
 
-## 2. データフローの理解
-
-### :pen: 例題 - 特定機能の処理流れ
-
-```
-#codebase
-このプロジェクトでタスクが追加されるまでの流れを追跡してください。
-
-関連するファイルとコードを特定し、以下の観点で説明してください：
-
-ユーザーインターフェース
-状態管理
-API通信
-データベース操作
-エラーハンドリング
-```
-
-### :robot: 出力例
-
-````markdown
-このプロジェクトにおけるタスクが追加されるまでの流れを、コードベースを詳細に分析して説明いたします。
-
-### 1. ユーザーインターフェース 📝
-
-#### **TodoInput コンポーネント** (TodoInput.tsx)
-- **入力フィールド**: `<input type="text">` でタスクテキストを入力
-- **追加ボタン**: `disabled={!inputValue.trim()}` で空文字入力を防止
-- **フォーム送信**: Enterキーまたはボタンクリックで送信
-- **バリデーション**: 空白のみの入力を無効化
-
-```tsx
-const handleSubmit = (e: React.FormEvent) => {
-  e.preventDefault();
-  if (inputValue.trim()) {
-    onAddTodo(inputValue);
-    setInputValue('');
-  }
-};
-```
-
-#### **TodoApp メインコンテナ** (TodoApp.tsx)
-- `<TodoInput onAddTodo={addTodo} />` で入力コンポーネントを配置
-- Tailwind CSSによるレスポンシブデザイン
-- ダークモード対応
-
-### 2. 状態管理 🔄
-
-#### **React Hooks による状態管理**
-```tsx
-const [todos, setTodos] = useState<Todo[]>([]);
-const [filter, setFilter] = useState<TodoFilter>('all');
-const [isInitialLoad, setIsInitialLoad] = useState(true);
-```
-
-#### **addTodo 関数** (TodoApp.tsx内)
-```tsx
-const addTodo = (text: string) => {
-  const newTodo: Todo = {
-    id: crypto.randomUUID(),            // 📝 ユニークID生成
-    text: text.trim(),                  // 📝 前後の空白除去
-    completed: false,                   // 📝 初期状態は未完了
-    createdAt: new Date(),              // 📝 作成日時
-    status: 'todo',                     // 📝 カンバン用ステータス
-    priority: 'medium',                 // 📝 デフォルト優先度
-  };
-  setTodos(prev => [newTodo, ...prev]); // 📝 配列の先頭に新規追加
-};
-```
-
-#### **型安全性** (todo.ts)
-```tsx
-export interface Todo {
-  id: string;
-  text: string;
-  completed: boolean;
-  createdAt: Date;
-  status?: TodoStatus;
-  priority?: Priority;
-}
-```
-
-### 3. API通信 🚫
-
-**このプロジェクトではAPI通信は実装されていません。**
-- 外部APIサーバーとの通信なし
-- バックエンドサーバーとの連携なし
-- すべてのデータはフロントエンドで完結
-
-### 4. データベース操作 📦
-
-#### **localStorage による永続化**
-```tsx
-const TODOS_STORAGE_KEY = 'todos';
-
-// 📝 データ保存
-useEffect(() => {
-  if (isInitialLoad) return; // 🚫 初回読み込み時は保存をスキップ
-
-  try {
-    localStorage.setItem(TODOS_STORAGE_KEY, JSON.stringify(todos));
-  } catch (error) {
-    console.error('❌ TodoApp: ローカルストレージへのデータ保存に失敗しました:', error);
-  }
-}, [todos, isInitialLoad]);
-
-// 📝 データ読み込み
-useEffect(() => {
-  try {
-    const storedTodos = localStorage.getItem(TODOS_STORAGE_KEY);
-    if (storedTodos) {
-      const parsedTodos = JSON.parse(storedTodos);
-      // 📅 日付オブジェクトを復元
-      const todosWithDates = parsedTodos.map((todo: any) => ({
-        ...todo,
-        createdAt: new Date(todo.createdAt),
-        status: todo.status || (todo.completed ? 'done' : 'todo'),
-        priority: todo.priority || 'medium',
-      }));
-      setTodos(todosWithDates);
-    }
-  } catch (error) {
-    console.error('ローカルストレージからのデータ読み込みに失敗しました:', error);
-  }
-}, []);
-```
-
-### 5. エラーハンドリング 🛡️
-
-#### **入力値検証**
-```tsx
-// TodoInput.tsx
-if (inputValue.trim()) {  // 📝 空白のみの入力を防止
-  onAddTodo(inputValue);
-  setInputValue('');
-}
-```
-
-#### **localStorage操作の例外処理**
-```tsx
-try {
-  localStorage.setItem(TODOS_STORAGE_KEY, JSON.stringify(todos));
-  console.log('✅ TodoApp: データ保存完了');
-} catch (error) {
-  console.error('❌ TodoApp: ローカルストレージへのデータ保存に失敗しました:', error);
-}
-```
-
-#### **データ復元時の互換性確保**
-```tsx
-status: todo.status || (todo.completed ? 'done' : 'todo'),  // 📝 既存データの互換性
-priority: todo.priority || 'medium',                        // 📝 デフォルト優先度
-```
-
-## 📊 タスク追加の完全なフロー
-
-1. **ユーザー入力** → TodoInput で文字列入力
-2. **バリデーション** → 空白チェック、trim処理
-3. **オブジェクト生成** → UUIDとタイムスタンプ付きTodoオブジェクト作成
-4. **状態更新** → React stateの更新（配列先頭に追加）
-5. **自動保存** → useEffectによるlocalStorage保存
-6. **UI更新** → 新しいTodoItemコンポーネントとしてレンダリング
-
-このプロジェクトは **「シンプルで堅牢なクライアントサイド完結型Todo管理システム」** として設計されており、外部依存を最小限に抑えながら、型安全性とユーザビリティを両立させています。
-````
-
----
-
-## 3. 技術的負債・改善点の発見
-
-### :pen: 例題 - コード品質分析
-
-```
-#codebase
-このプロジェクトのコードを分析して、以下の観点で技術的負債や改善点を指摘してください：
-
-1. コードの重複（DRY原則違反）
-2. 型安全性の問題
-3. パフォーマンスの問題
-4. セキュリティの懸念
-5. テストカバレッジの不足
-6. 保守性の問題
-
-具体的なファイル名とコード例を示して改善提案をしてください。
-```
-
-### :robot: 出力例
-
-````markdown
-プロジェクトのタスク追加フローを分析するために、まずプロジェクト全体の構造と技術スタックを把握し、関連するファイルを特定します。 プロジェクトの技術的負債と改善点を分析するために、まずプロジェクト全体のコードを調査します。Next.js + React + TypeScriptプロジェクトであることが分かったので、主要なコンポーネントとユーティリティファイルを確認していきます。 プロジェクトの技術的負債と改善点を分析するために、関連するファイルを詳しく調査します。 このプロジェクトの技術的負債と改善点を分析するために、より多くのファイルを調査します。 プロジェクトの技術的負債と改善点を分析するために、まず全体のコード構造を把握し、関連するファイルを詳しく調査します。 プロジェクトの技術的負債と改善点を分析するために、残りのファイルも確認して全体像を把握します。 プロジェクトのコードベースを詳細に分析し、技術的負債と改善点を特定します。まず、コードベース全体を検索して詳しく調査します。 続いて、より詳細な分析のためにプロジェクトの構造とテストファイルを調査します。 プロジェクト全体のコードベースを詳細に分析した結果、以下の技術的負債と改善点を特定しました：
-
-## 🔍 技術的負債と改善点の分析
-
-### 1. コードの重複（DRY原則違反）
-
-#### 📍 **問題箇所: TodoItem.tsx**
-- **スタイル関数の重複**: `getPriorityStyle()`と`getStatusStyle()`で同様のパターンが繰り返されている
-- **配列定義の重複**: 優先度とステータスの配列がハードコーディングされている
-
-```tsx
-// ❌ 問題: 類似パターンの重複
-const getPriorityStyle = (priority: Priority) => {
-  switch (priority) {
-    case 'high': return 'bg-red-100 text-red-800 border-red-200...';
-    // 他のケース
-  }
-};
-
-const getStatusStyle = (status: TodoStatus) => {
-  switch (status) {
-    case 'todo': return 'bg-blue-100 text-blue-800 border-blue-200...';
-    // 他のケース
-  }
-};
-```
-
-**💡 改善提案:**
-```tsx
-// ✅ 改善: 共通のスタイルマップ
-const styleConfig = {
-  priority: {
-    high: 'bg-red-100 text-red-800 border-red-200...',
-    medium: 'bg-yellow-100 text-yellow-800 border-yellow-200...',
-    low: 'bg-green-100 text-green-800 border-green-200...'
-  },
-  status: {
-    todo: 'bg-blue-100 text-blue-800 border-blue-200...',
-    'in-progress': 'bg-yellow-100 text-yellow-800...',
-    done: 'bg-green-100 text-green-800...'
-  }
-} as const;
-
-const getStyleByType = (type: 'priority' | 'status', value: string) =>
-  styleConfig[type][value as keyof typeof styleConfig[typeof type]] || '';
-```
-
-#### 📍 **問題箇所: TodoApp.tsx**
-- **モーダル状態管理の重複**: 削除モーダルの状態リセット処理が重複
-
-```tsx
-// ❌ 問題: handleConfirmDelete と handleCancelDelete で重複
-const handleConfirmDelete = () => {
-  deleteTodo(deleteModal.todoId);
-  setDeleteModal({ isOpen: false, todoId: '', todoTitle: '' }); // 重複
-};
-
-const handleCancelDelete = () => {
-  setDeleteModal({ isOpen: false, todoId: '', todoTitle: '' }); // 重複
-};
-```
-
-### 2. 型安全性の問題
-
-#### 📍 **重大な問題: TodoApp.tsx (line 37)**
-```tsx
-// ❌ 危険: any型の使用
-const todosWithDates = parsedTodos.map((todo: any) => ({
-  ...todo,
-  createdAt: new Date(todo.createdAt),
-  status: todo.status || (todo.completed ? 'done' : 'todo'),
-  priority: todo.priority || 'medium',
-}));
-```
-
-**💡 改善提案:**
-```tsx
-// ✅ 改善: 適切な型定義
-interface StoredTodo {
-  id: string;
-  text: string;
-  completed: boolean;
-  createdAt: string; // ISO string
-  status?: TodoStatus;
-  priority?: Priority;
-}
-
-const todosWithDates = (parsedTodos as StoredTodo[]).map((todo) => ({
-  ...todo,
-  createdAt: new Date(todo.createdAt),
-  status: todo.status || (todo.completed ? 'done' : 'todo'),
-  priority: todo.priority || 'medium',
-}));
-```
-
-#### 📍 **問題: crypto.randomUUID() のブラウザ対応**
-```tsx
-// ❌ 問題: ブラウザ対応不十分
-id: crypto.randomUUID(), // 古いブラウザで未対応
-```
-
-### 3. パフォーマンスの問題
-
-#### 📍 **重大な問題: useCallback/useMemo の未使用**
-```tsx
-// ❌ 問題: 毎回新しい関数が生成される
-const addTodo = (text: string) => { /* ... */ };
-const toggleTodo = (id: string) => { /* ... */ };
-const deleteTodo = (id: string) => { /* ... */ };
-
-// TodoItem への props として渡される関数群も最適化されていない
-```
-
-**💡 改善提案:**
-```tsx
-// ✅ 改善: useCallback で最適化
-const addTodo = useCallback((text: string) => {
-  const newTodo: Todo = {
-    id: generateId(),
-    text: text.trim(),
-    completed: false,
-    createdAt: new Date(),
-    status: 'todo',
-    priority: 'medium',
-  };
-  setTodos(prev => [newTodo, ...prev]);
-}, []);
-
-const filteredTodos = useMemo(() => {
-  return todos.filter(todo => {
-    if (filter === 'active') return !todo.completed;
-    if (filter === 'completed') return todo.completed;
-    return true;
-  });
-}, [todos, filter]);
-```
-
-#### 📍 **問題: TodoItem.tsx の非効率な関数定義**
-```tsx
-// ❌ 問題: 毎回新しい配列とインデックス計算
-const handlePriorityClick = () => {
-  const priorities: Priority[] = ['low', 'medium', 'high']; // 毎回作成
-  const currentIndex = priorities.indexOf(todo.priority || 'medium');
-  const nextIndex = (currentIndex + 1) % priorities.length;
-  onUpdatePriority(todo.id, priorities[nextIndex]);
-};
-```
-
-### 4. セキュリティの懸念
-
-#### 📍 **問題: XSS脆弱性**
-```tsx
-// ❌ 潜在的問題: ユーザー入力の直接レンダリング
-<div>{todo.text}</div> // サニタイゼーション未実装
-```
-
-#### 📍 **問題: localStorage のエラーハンドリング不十分**
-```tsx
-// ❌ 問題: プライベートブラウジングモードでのエラー未対応
-localStorage.setItem(TODOS_STORAGE_KEY, JSON.stringify(todos));
-```
-
-### 5. テストカバレッジの不足
-
-#### 📍 **重大な不足: 主要コンポーネントのテスト不足**
-- **TodoApp.tsx**: テストファイルが存在しない（最重要コンポーネント）
-- **TodoItem.tsx**: テストファイルが存在しない
-- **DeleteConfirmModal.tsx**: テストファイルが存在しない
-
-**既存テスト:**
-- ✅ TodoFilter.test.tsx: 存在
-- ✅ TodoInput.test.tsx: 存在
-- ✅ dateUtils.test.ts: 存在
-
-**💡 改善提案:**
-```bash
-# 不足しているテストファイル
-src/components/list/TodoApp.test.tsx      # 最優先
-src/components/list/TodoItem.test.tsx     # 高優先度
-src/components/list/DeleteConfirmModal.test.tsx # 中優先度
-src/lib/sampleData.test.ts               # 低優先度
-```
-
-### 6. 保守性の問題
-
-#### 📍 **問題: 定数の分散管理**
-```tsx
-// ❌ 問題: 複数箇所で優先度配列が定義されている
-// TodoItem.tsx
-const priorities: Priority[] = ['low', 'medium', 'high'];
-const statuses: TodoStatus[] = ['todo', 'in-progress', 'done'];
-```
-
-**💡 改善提案:**
-```tsx
-// ✅ 改善: 共通定数ファイル
-// src/constants/todo.ts
-export const PRIORITIES = ['low', 'medium', 'high'] as const;
-export const STATUSES = ['todo', 'in-progress', 'done'] as const;
-export const STORAGE_KEYS = {
-  TODOS: 'todos',
-  FILTER: 'todoFilter'
-} as const;
-```
-
-#### 📍 **問題: 過剰なデバッグログ**
-```tsx
-// ❌ 問題: 本番環境でもデバッグログが出力される
-console.log('🔄 TodoApp: データ読み込み開始');
-console.log('📦 TodoApp: 保存されたデータ:', parsedTodos.length, '件');
-```
-
-**💡 改善提案:**
-```tsx
-// ✅ 改善: 開発環境のみデバッグログ
-const logger = {
-  debug: (message: string, ...args: any[]) => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log(message, ...args);
-    }
-  }
-};
-```
-
-#### 📍 **問題: 長大なTodoApp.tsx（300行超）**
-- 単一責任原則違反
-- 状態管理、UI、ビジネスロジックが混在
-
-**💡 改善提案:**
-```tsx
-// ✅ 改善: カスタムフック分離
-// hooks/useTodos.ts
-export const useTodos = () => {
-  // 状態管理ロジック
-};
-
-// hooks/useLocalStorage.ts
-export const useLocalStorage = <T>(key: string, initialValue: T) => {
-  // localStorage 操作
-};
-```
-
-## 📋 優先度付き改善ロードマップ
-
-### 🔴 **高優先度（即座に対応）**
-1. **any型の除去** (TodoApp.tsx line 37)
-2. **useCallback/useMemo の導入** (パフォーマンス改善)
-3. **TodoApp.test.tsx の作成** (テストカバレッジ)
-
-### 🟡 **中優先度（次期リリース）**
-1. **定数ファイルの統合**
-2. **カスタムフック分離**
-3. **XSS対策の実装**
-
-### 🟢 **低優先度（長期的改善）**
-1. **スタイル設定の共通化**
-2. **デバッグログの環境別制御**
-3. **エラーバウンダリの実装**
-
-この分析結果に基づいて段階的に改善を進めることで、より保守性が高く、安全で高性能なアプリケーションに改善できます。
-````
-
-> **💡 Tips: リファクタリングへの活用**
->
-> この分析結果を活用して、**段階的なリファクタリング**を実施できます：
->
-> **実施手順：**
-> 1. **ファイル別分析**: 改善が必要なファイルを特定
-> 2. **優先度付け**: リスク・影響度に基づく優先順位決定
-> 3. **段階的実施**: 小さな単位での安全なリファクタリング
-> 4. **継続的監視**: 改善効果の測定と追加課題の発見
->
-> **リファクタリング用プロンプト例：**
-> ```
-> #file:[対象ファイル] このファイルをリファクタリングしてください。以下の観点で改善してください：
->
-> 1. コードの重複を排除（DRY原則）
-> 2. 関数の責務を明確化（単一責任原則）
-> 3. 型安全性の向上
-> 4. パフォーマンスの最適化
-> 5. 可読性・保守性の向上
->
-> 変更前後の差分と改善効果を説明してください。
-> ```
-
----
-
-## 4. 個別ファイルの詳細分析
+## 2. 個別ファイルの詳細分析
 
 特定のファイルに焦点を当てて、その実装詳細を深く理解する手法を学びます。
 
 ### :pen: 例題 - 特定ファイルの実装理解
 
-```
+```markdown
 #file:TodoFilter.tsx このファイルの実装について以下を教えてください：
 
 1. このコンポーネント/モジュールの役割と責務
@@ -897,13 +423,13 @@ ${input:filePath:分析対象ファイルパス} の実装について以下を�
 
 ---
 
-## 5. 特定実装の場所特定
+## 3. 特定実装の場所特定
 
 プロジェクト全体で特定の機能がどこに実装されているかを効率的に特定する手法を学びます。
 
 ### :pen: 例題 - 特定機能の実装箇所特定
 
-```
+```markdown
 #codebase
 このプロジェクトでタスクの追加がどこで実装されているか特定してください。
 
@@ -991,11 +517,6 @@ Copilot が特定機能の実装箇所を調査した結果がここに表示さ
    - `#codebase`でテスト検索を実行
    - 期待する結果が得られない場合は上位インデックスを検討
 
-**ステータス確認:**
-ステータスバーのCopilotアイコンからインデックス作成状況を確認できます。
-
-![ワークスペースインデックス状況](../images/workspace-index-status.png)
-
 **📝 注意事項:**
 - リモートインデックスはGitHubリポジトリが必要
 - ローカルインデックスは2500ファイルまでの制限
@@ -1062,17 +583,22 @@ Copilot が特定機能の実装箇所を調査した結果がここに表示さ
    - 技術スタックとアーキテクチャの把握
    - フォルダ構造の理解
 
-2. **特定機能の深堀り分析**
-   - データフローの追跡練習
-   - 個別ファイルの詳細分析
-   - 実装パターンの特定
+2. **個別ファイルの詳細分析**
+   - 特定ファイルの実装詳細調査
+   - 型定義と関数の責務の理解
+   - 依存関係とエラーハンドリングの確認
 
-3. **コード品質分析**
-   - 技術的負債の発見
-   - セキュリティ観点での評価
-   - パフォーマンス問題の特定
+3. **データフロー追跡の練習**
+   - 特定機能の処理流れを追跡
+   - ユーザーインターフェースから状態管理までの流れ把握
+   - API通信やデータ永続化の仕組み理解
 
-4. **実践的活用**
+4. **技術的負債の発見**
+   - コード品質の分析（DRY原則、型安全性）
+   - パフォーマンスやセキュリティ観点での評価
+   - テストカバレッジと保守性の確認
+
+5. **実践的活用**
    - 新人オンボーディング資料の作成
    - 改善提案レポートの作成
    - アーキテクチャドキュメントの更新

@@ -207,7 +207,7 @@ applyTo: "**/*.test.ts,**/*.spec.ts"
 3. 保存場所を選択：
    - **Workspace**: `.github/prompts/` フォルダ（ワークスペース固有）
    - **User profile**: ユーザープロファイル（複数ワークスペース共通）
-4. ファイル名を入力（例：`create-component.prompt.md`）
+4. ファイル名を入力（例：`refactor-typescript.prompt.md`）
 
 ### 5.2 ファイル構造
 
@@ -216,9 +216,9 @@ applyTo: "**/*.test.ts,**/*.spec.ts"
 プロジェクトルート/
 ├── .github/
 │   └── prompts/
-│       ├── create-component.prompt.md    # 📝 コンポーネント生成用
-│       ├── api-review.prompt.md          # 📝 API レビュー用
-│       └── security-check.prompt.md      # 📝 セキュリティチェック用
+│       ├── refactor-typescript.prompt.md    # 📝 TypeScriptリファクタリング用
+│       ├── api-review.prompt.md             # 📝 API レビュー用
+│       └── security-check.prompt.md         # 📝 セキュリティチェック用
 └── ...
 ```
 
@@ -226,19 +226,20 @@ applyTo: "**/*.test.ts,**/*.spec.ts"
 ```markdown
 ---
 mode: agent
-model: GPT-4.1
-description: "Reactコンポーネント生成プロンプト"
-tools: ["editFiles", "runTests", "codebase"]
+model: Claude Sonnet 4
+description: "TypeScriptファイルリファクタリングプロンプト"
+tools: ["editFiles", "problems", "codebase", "usages"]
 ---
 
-# React コンポーネントの生成
+# TypeScript ファイルのリファクタリング
 
-${input:componentName:コンポーネント名} コンポーネントを作成してください。
+${file} ファイルをリファクタリングしてください。
 
-## 要件
-- TypeScript対応
-- styled-components使用
-- テストファイルも生成
+## リファクタリング観点
+- 型安全性の向上
+- パフォーマンスの最適化
+- 可読性・保守性の改善
+- DRY原則の適用
 ```
 
 **構造要素：**
@@ -254,32 +255,38 @@ ${input:componentName:コンポーネント名} コンポーネントを作成�
 | 項目 | 説明 | 例 |
 |------|------|-----|
 | `mode` | チャットモード | `"agent"`, `"ask"`, `"edit"` |
-| `model` | 使用するAIモデル | `"gpt-4"`, `"Claude Sonnet 4"` |
-| `description` | プロンプトの説明文 | `"Reactコンポーネント生成プロンプト"` |
-| `tools` | 使用可能なツール・ツールセット | `["editFiles", "runTests"]` |
+| `model` | 使用するAIモデル | `"GPT-4.1"`, `"Claude Sonnet 4"` |
+| `description` | プロンプトの説明文 | `"TypeScriptファイルリファクタリングプロンプト"` |
+| `tools` | 使用可能なツール・ツールセット | `["editFiles", "problems"]` |
 
 ### 5.3 導入方法
 
-コンポーネント作成用のプロンプトファイルを作成します。
+TypeScriptファイルのリファクタリング用プロンプトファイルを作成します。
 
-**コンポーネント生成プロンプト（`create-component.prompt.md`）:**
+**リファクタリング用プロンプト（`refactor-typescript.prompt.md`）:**
 ```markdown
 ---
 mode: agent
 model: GPT-4.1
-description: "Reactコンポーネント生成プロンプト"
-tools: ["editFiles", "runTests", "codebase"]
+description: "TypeScriptファイルリファクタリングプロンプト"
+tools: ["editFiles", "problems", "codebase"]
 ---
 
-# React コンポーネントの生成
+# TypeScript ファイルのリファクタリング
 
-${input:componentName:コンポーネント名} コンポーネントを作成してください。
+${file} ファイルをリファクタリングしてください。
 
-## 要件
-- TypeScript対応
-- styled-components使用
-- テストファイルも生成
+## リファクタリング観点
+- 型安全性の向上
+- パフォーマンスの最適化
+- 可読性・保守性の改善
+- DRY原則の適用
 
+## 具体的な改善項目
+1. any型の除去
+2. useCallback/useMemo の適用
+3. 重複コードの共通化
+4. エラーハンドリングの強化
 ```
 
 ### 5.4 プロンプトファイルの呼び出し方法
@@ -295,12 +302,12 @@ ${input:componentName:コンポーネント名} コンポーネントを作成�
 チャット入力欄で `/` に続けてプロンプトファイル名を入力：
 
 ```
-/create-component
+/refactor-typescript
 ```
 
-**追加パラメータの指定も可能：**
+**ファイルを指定してリファクタリング実行：**
 ```
-/create-component: componentName=MyButton
+/refactor-typescript #file:src/components/TodoApp.tsx
 ```
 
 #### 方法3: エディタの再生ボタンから実行
@@ -327,10 +334,10 @@ ${input:componentName:コンポーネント名} コンポーネントを作成�
 │   ├── testing.instructions.md       # 📝 テスト専用指示
 │   └── database.instructions.md      # 📝 データベース専用指示
 └── prompts/
-    ├── create-api.prompt.md          # 📝 API作成用プロンプト
-    ├── create-component.prompt.md    # 📝 コンポーネント作成用
-    ├── code-review.prompt.md         # 📝 コードレビュー用
-    └── security-check.prompt.md      # 📝 セキュリティチェック用
+    ├── refactor-typescript.prompt.md    # 📝 TypeScriptリファクタリング用
+    ├── create-component.prompt.md       # 📝 コンポーネント作成用
+    ├── code-review.prompt.md            # 📝 コードレビュー用
+    └── security-check.prompt.md         # 📝 セキュリティチェック用
 ```
 
 ### 6.2 段階的導入のベストプラクティス
@@ -356,7 +363,7 @@ ${input:componentName:コンポーネント名} コンポーネントを作成�
    - 使用している技術スタック用
 
 3. **再利用プロンプト**: `.prompt.md` ファイルを作成してください
-   - コンポーネント作成用
+   - TypeScriptリファクタリング用
 
 4. **動作確認**: 作成したファイルが正しく機能することを確認してください
 

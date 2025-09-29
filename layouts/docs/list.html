@@ -1,0 +1,40 @@
+{{ define "main" }}
+<div class="col-12 col-md-9 col-xl-8 ps-md-5 td-content" role="main">
+	<article class="doc-list-section">
+		<header class="mb-4">
+			<h1>{{ .Title }}</h1>
+			{{ with .Params.lead }}<p class="lead">{{ . | markdownify }}</p>{{ end }}
+		</header>
+		<div class="content mb-5">
+			{{ .Content }}
+		</div>
+
+		<!-- {{/* 子セクション一覧 */}}
+		{{ $sections := .Sections }}
+		{{ if gt (len $sections) 0 }}
+		<section class="child-sections mb-4">
+			<h2>セクション</h2>
+			<ul>
+				{{ range $sections }}
+					<li><a href="{{ .RelPermalink }}">{{ .Title }}</a>{{ with .Params.description }} – {{ . }}{{ end }}</li>
+				{{ end }}
+			</ul>
+		</section>
+		{{ end }}
+
+		{{/* 直下ページ一覧 */}}
+		{{ $pages := .Pages }}
+		{{ if gt (len $pages) 0 }}
+		<section class="child-pages mb-4">
+			<h2>ページ</h2>
+			<ul>
+				{{ range $pages.ByWeight }}
+					<li><a href="{{ .RelPermalink }}">{{ .Title }}</a>{{ with .Params.description }} – {{ . }}{{ end }}</li>
+				{{ end }}
+			</ul>
+		</section>
+		{{ end }} -->
+
+	</article>
+</div>
+{{ end }}

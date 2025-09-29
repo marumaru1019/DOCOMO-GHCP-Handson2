@@ -3,9 +3,16 @@
   "configurations": {
     "sbkk-git-hub-copilot-handson": {
       "appLocation": ".",
-      "outputLocation": "public",
-      "appBuildCommand": "hugo -D",
-      "run": "hugo server -D",
+  "outputLocation": "public",
+  "appBuildCommand": "npx hugo -D",
+  "run": "npx hugo server -D",
+      "appDevserverUrl": "http://localhost:1313"
+    },
+    "docomo-ghcp-handson": {
+      "appLocation": ".",
+  "outputLocation": "public",
+  "appBuildCommand": "npx hugo -D",
+  "run": "npx hugo server -D",
       "appDevserverUrl": "http://localhost:1313"
     }
   }
