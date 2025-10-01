@@ -1,170 +1,202 @@
 ---
-title: ① エージェントモード
-categories: [GitHub Copilot, エージェントモード]
+title: ① コード補完
+categories: [技術者向け, GitHub Copilot 基本]
+tags: [json, csv, Format]
 weight: 1
 ---
 
-## 1. エージェントモード とは？
-
-> **概要：** GitHub Copilot の3つのモード（Ask、Edit、Agent）の中で最も強力なモードです。高レベルの指示を渡すと、Copilot が自律的に手順を計画し、適切なファイルを選択し、複数のステップにわたってタスクを完了まで実行します。
-
-Agent モードの特徴：
-
-* **自律的な実行**: 単一の指示から複数のファイル編集を計画・実行
-* **プロジェクト全体の理解**: 関連ファイルを自動的に特定し、整合性を保つ
-* **継続的な実行**: 各ステップでの承認を待たずに目標達成まで実行
-
-例えば、「Todo型のtextプロパティをtitleに変更してください」と指示すると、型定義だけでなく、関連するすべてのコンポーネントとテストファイルを自動で更新します。
+GitHub Copilot の最も基本的な使用法のひとつが**コード補完**です。途中まで書いたコードに対して候補を提案してくれるため、最小限のタイプで実装が可能になります。ここでは **JavaScript** を使ったサンプルを示しながら、**複数候補の確認**や**部分的な提案の受け入れ**を含めて解説します。
 
 ---
 
-## 2. Agent モードの動作特性
+## :pen: 例題1. 基本的なコード補完
 
-Agent モードは他のモード（Ask、Edit）とは大きく異なる特性を持っています。
+まず、関数本体をコメントだけにして止めてみます。
 
-```mermaid
-flowchart LR
-    A["高レベルの指示<br/>（例：認証機能を追加）"] -->|自律的な計画立案| B["必要なファイル・手順を特定"]
-    B -->|自動実行| C["複数ファイルの編集"]
-    C -->|継続実行| D["関連する追加変更"]
-    D -->|完了まで継続| E["タスク完了"]
-
-    style A fill:#e1f5fe
-    style E fill:#e8f5e8
+```javascript
+function calculateSum(a, b) {
+   // ここで実装を中断
+}
 ```
 
-**Edit モードとの重要な違い：**
+これで入力を中断すると、Copilot が残りの実装を**ゴーストテキスト**（薄いグレーのテキスト）で提案してくれます。
 
-* **スコープ**: 指定範囲だけでなく、プロジェクト全体の整合性を考慮
-* **実行方法**: 各ステップでの承認を待たずに自動的に編集を適用
-* **制御**: 開発者が目標を定義し、Copilot が「ドライバー」として実行
+**提案の受け入れ**
+- **Tabキー** で提案を承認
+- **Escキー** で却下
+- **部分受け入れ**: Mac: `⌘→` / Windows/Linux: `Ctrl+→` で次の単語だけを承認
 
-> **注意点**
->
-> Agent モードは制御を一部手放すことになります。時には予期しないファイルに触れたり、想定と異なる方向に進むことがあります。そのため、センシティブなシステムや的を絞った変更が必要な場合は、Edit モードの方が適している場合があります。ategories: [GitHub Copilot, エージェントモード]
+##  :robot: 出力例
+
+```javascript
+function calculateSum(a, b) {
+   return a + b;
+}
+```
+
+![補完結果イメージ](../images/code_suggestion.png)
 
 ---
 
-## 3. 具体的な使用例
+##  :pen: 例題2. コメント駆動でのコード生成
 
+コメントを使って、具体的な実装を指示できます。
 
-### :pen: 例題 1 - 機能追加（作成日時表示）
-
-GHCP-TodoApp に作成日時表示機能を追加してみましょう。
-
-```text
-Todoアイテムに作成日時を「〇分前」「〇時間前」形式で表示する機能を追加してください。既存のcreatedAtプロパティを活用し、日本語表示にしてください
+```javascript
+// JavaScript で Student クラスを作成
+// プロパティ: name, age, grade
+// メソッド: getInfo() - 学生情報を文字列で返す
+// メソッド: isAdult() - 18歳以上かどうかを返す
 ```
 
-### :robot: 出力例 1
+このようなコメントを書くと、Copilot が意図に沿ったクラス構造を提案してくれます。
 
-Copilot が以下の処理を自動実行します：
+##  :robot: 出力例
 
-1. `lib/dateUtils.ts` に相対時間表示のユーティリティ関数を作成
-2. `TodoItem.tsx` に作成日時表示コンポーネントを追加
-3. 日本語での時間表示ロジックを実装
-4. `npm test` を実行してテストが通ることを確認
+```javascript
+// JavaScript で Student クラスを作成
+// プロパティ: name, age, grade
+// メソッド: getInfo() - 学生情報を文字列で返す
+// メソッド: isAdult() - 18歳以上かどうかを返す
+class Student {
+   constructor(name, age, grade) {
+      this.name = name;
+      this.age = age;
+      this.grade = grade;
+   }
 
-最終的に以下のような日時表示機能が追加されます：
+   getInfo() {
+      return `Name: ${this.name}, Age: ${this.age}, Grade: ${this.grade}`;
+   }
 
-```tsx
-// lib/dateUtils.ts の一部
-export const getRelativeTime = (date: Date): string => {
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / (1000 * 60));
+   isAdult() {
+      return this.age >= 18;
+   }
+}
 
-  if (diffMins < 1) return 'たった今';
-  if (diffMins < 60) return `${diffMins}分前`;
-  if (diffMins < 1440) return `${Math.floor(diffMins / 60)}時間前`;
-  return `${Math.floor(diffMins / 1440)}日前`;
-};
+// 利用例
+const s = new Student("Taro", 19, "A");
+console.log(s.getInfo());
+console.log("isAdult:", s.isAdult());
 ```
-
-【実装された画面】
-![ツールの選択方法](../images/time.png)
-
-
-
-### :pen: 例題 2 - コード解説（Todoタスク追加処理の流れ）
-
-GHCP-TodoAppでタスクを追加するときの内部処理を詳しく解説してもらいましょう。
-
-```text
-GHCP-TodoAppでタスクを追加するときに実際にどのような処理で行われているか解説してください。コードの流れやコンポーネント間の連携も含めて詳しく説明してください
-```
-
-### :robot: 出力例 2
-
-Copilot が以下のような詳細な解説を提供します：
-
-1. **ユーザー入力からTodo追加までの流れ**
-   - `TodoInput.tsx` でのフォーム送信イベント処理
-   - 入力値のバリデーションとサニタイゼーション
-   - 新しいTodoオブジェクトの生成（id、createdAt等）
-
-2. **状態管理とコンポーネント間連携**
-   - `TodoApp.tsx` の `addTodo` 関数の動作原理
-   - React useState による状態更新メカニズム
-   - Todoリストのre-renderingプロセス
-
-3. **実際のコード例とフロー図**
-   ```typescript
-   // TodoInput.tsx での処理例
-   const handleSubmit = (e: FormEvent) => {
-     e.preventDefault();
-     if (text.trim()) {
-       onAddTodo({
-         id: Date.now().toString(),
-         text: text.trim(),
-         completed: false,
-         createdAt: new Date()
-       });
-       setText('');
-     }
-   };
-   ```
-
-4. **パフォーマンス考慮点とベストプラクティス**
-   - key propによるReact要素の効率的な更新
-   - 不要なre-renderを避けるための最適化手法
-
-解説完了後、関連するコードファイルへのリンクや追加の技術的詳細も提供されます。
 
 ---
 
-## 4. 変更のレビューと確定方法
 
-| 操作        | 実行方法                                  | 結果           |
-| --------- | ------------------------------------- | ------------ |
-| 変更内容の確認        | `↑↓`                                | 変更前と後の差分を確認        |
-| ファイルごとの採用        | `保持`                                | 変更を確定        |
-| ファイルごとの却下        | `元に戻す`                                | 元に戻す         |
-| 一括採用／却下   | Chat ビュー `保持` / `元に戻す` | 全変更をまとめて処理   |
-| 直前リクエスト取消 | Chat ビューで`巻き戻しアイコン`                   | 直前の変更を全て巻き戻し |
-| 取消の再適用    | Chat ビューで`やり直しアイコン`                   | 巻き戻した変更を再適用  |
+## 複数の候補を表示する
 
-![変更のレビュー](../images/agent_confirm.png)
+入力内容によっては、Copilot が**複数の候補**を提示することがあります。
+
+![複数候補](../images/multi_suggest.png)
+
+- Windows/Linux: **Alt + ]** (次の候補)、**Alt + [** (前の候補)
+- macOS: **Option + ]** (次の候補)、**Option + [** (前の候補)
+
+たとえば「return a + b」以外にも「sum = a + b; return sum」など変数を使った異なるパターンが候補に出ることがあります。好きな案を選んでTabキーで受け入れる、必要なければEscキーでスキップしましょう。
+
+---
+
+## 部分的な提案の受け入れ
+
+GitHub Copilot が複数行をまとめて提案した場合、「全部はいらないけど、一部だけ取り込みたい」ことがあります。そこで**部分的な受け入れ**が可能です。
+
+![部分的提案の受け入れ](../images/accept_part.png)
+
+1. **次の単語だけ承諾**
+   - マウスを候補上に置くと「Accept Word」というボタンが表示されます。
+   - Windows/Linuxでは **Ctrl + →**、macOSでは **Cmd + →** のショートカットも利用できます。
+
+2. **次の行だけ承諾**
+   - マウスを候補上に置くと「Accept Line」というボタンが表示されます。
+   - `editor.action.inlineSuggest.acceptNextLine` にカスタムキーを割り当てることで、この行だけを受け入れることが可能です。
 
 
 ---
 
-### :memo: 練習
+## Next Edit Suggestions（NES）
 
-以下の演習で Agent mode の理解を深めましょう：
+GitHub Copilot の **Next Edit Suggestions（NES）** は、現在の編集に基づいて次に必要な編集箇所を予測し、提案してくれる機能です。
+インライン補完が「今この行」を埋めるのに特化しているのに対し、**NES は“変更が波及しそうな次の編集箇所”へ Tab でジャンプできるナビゲーション支援**です。設定で `github.copilot.nextEditSuggestions.enabled` を ON にすると：
+- 変数 / 関数 / クラス名を 1 箇所リネーム → 残りの出現箇所を順送りで確認
+- 新フィールド追加 → 関連メソッドや計算式への反映漏れを案内
+- 条件やロジックの一部変更 → 連動する比較・派生処理の更新候補を提示
+“どこをまだ直していないか” の記憶コストを減らし、リネームや構造変更で威力を発揮します。
 
-1. **簡単なUI改善**
-   「GHCP-TodoAppのボタンにホバー効果とアニメーションを追加してください」
+### 設定の有効化
 
-2. **入力バリデーション追加**
-   「Todo追加時に空文字や重複チェックを行い、エラーメッセージを表示してください」
+まず、VS Code の設定で NES を有効化します：
 
-3. **キーボードショートカット追加**
-   「Ctrl+Enterで新しいTodo追加、Escapeで編集キャンセルできるようにしてください」
+1. **設定** > **拡張機能** > **GitHub Copilot**
+2. `github.copilot.nextEditSuggestions.enabled` を **有効** にする
 
-> **💡 コツ**: GHCP-TodoAppは既存の機能が充実しているので、小さな改善から始めて段階的に機能拡張していくと効果的です。
+または、設定画面で `Next Edit Suggestions` を検索して有効化してください。
 
-## 5. まとめ
+### :pen: 例題3. リネームの自動適用
+例題2で作成した Student クラスの `age` プロパティを `yearsOld` にリネームしてみます。
+```javascript
+// プロパティ: name, yearsOld, grade
+```
 
-* Agent mode は **チャット指示だけでコード改修〜検証まで自動化** する生産性向上機能です。
-* **複数ファイル編集**と**CLI 実行**が一体化しているため、大規模改修でも開発者はレビューに集中できます。
+1. `age` を 1 箇所 `yearsOld` に変更すると、**ガターに矢印**が表示される場合があります
+2. **Tabキー** を押すと、次の編集提案（他の `age` 出現箇所）にジャンプ
+3. 再度 **Tabキー** で変更を確定し、すべての参照が更新されるか確認
+
+###  :robot: 出力例
+
+```javascript
+// リネーム後（例）: age -> yearsOld
+class Student {
+   constructor(name, yearsOld, grade) {
+      this.name = name;
+      this.yearsOld = yearsOld;
+      this.grade = grade;
+   }
+
+   getInfo() {
+      return `Name: ${this.name}, YearsOld: ${this.yearsOld}, Grade: ${this.grade}`;
+   }
+
+   isAdult() {
+      return this.yearsOld >= 18;
+   }
+}
+```
+
+![NES](../images/nes.png)
+
+> 補足: NES の提案が多すぎて視界が騒がしい場合は `editor.inlineSuggest.edits.showCollapsed` を有効にし、必要な時だけ展開する運用が有効です。
+
+---
+
+## :memo: 練習
+
+1. **基本的なコード補完を試す**
+   途中まで関数を書いて、ゴーストテキストが表示されたら Tab で受け入れてみる。
+   部分受け入れ（Mac: `⌘→` / Windows/Linux: `Ctrl+→`）も試してみてください。
+
+2. **コメント駆動開発を体験**
+   コメントで実装したい内容を詳しく書いて、Copilot に生成させてみる。
+   - クラスの構造
+   - 関数の処理内容
+   - アルゴリズムの方針など
+
+3. **複数候補を確かめる**
+   Alt + ] / Alt + [ で前後の候補を比較し、好きなものを受け入れてみる。
+   `Ctrl + Enter` で複数候補の一括表示も試してみましょう。
+
+4. **Next Edit Suggestions（NES）を活用**
+   変数名やクラス名を変更して、ガターの矢印が表示されることを確認。
+   Tab キーで次の編集箇所にジャンプし、連鎖的な編集を体験してみましょう。
+
+5. **部分的承諾の活用**
+   ログ出力や不要な初期化コードを含む提案が出た場合、一部だけを承諾・残りをスキップしてみましょう。
+
+---
+
+## まとめ
+
+- **基本的なコード補完**: 途中まで書くと Copilot がゴーストテキストで残りを推測・補完
+- **コメント駆動開発**: 詳細なコメントを書くことで、意図に沿ったコード構造を生成可能
+- **複数の候補**: Alt + ] / Alt + [ で前後を切り替えてベストなものを選択
+- **部分的な承諾**: Mac: `⌘→` / Windows/Linux: `Ctrl+→` で単語単位の受け入れが可能
+- **Next Edit Suggestions（NES）**: 変数名変更などの編集に基づいて、次の編集箇所を自動予測・提案

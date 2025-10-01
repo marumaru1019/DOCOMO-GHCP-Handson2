@@ -1,386 +1,203 @@
 ---
-title: ④ Copilot のカスタマイズ
-categories: [GitHub Copilot, Agent Mode]
-weight: 4
----
 
-## 1. Copilot のカスタマイズ方法は？
-VS Code の GitHub Copilot は、**カスタム指示**や**プロンプトファイル**を使用してAIの応答をプロジェクトの要件に合わせてカスタマイズできます。毎回同じコンテキストを入力する代わりに、ファイルに保存して自動的にすべてのチャットリクエストに含めることが可能です。
+title: ④ ショートカットコマンドの活用
+categories: [技術者向け, GitHub Copilot 応用]
+weight: 5
+---------
 
-> **ポイント**
->
-> * **カスタム指示** … コーディング規約や技術スタックに関する共通ガイドライン（**どのように**作業を行うか）
-> * **プロンプトファイル** … 特定タスク用の再利用可能なプロンプト（**何を**行うか）
-> * **自動適用** … ワークスペース全体またはファイル固有の自動適用
-> * **チーム共有** … バージョン管理でチーム全体の標準化
+GitHub Copilot Chat は、**チャット参加者 (@xxx)**、**スラッシュコマンド (/xxx)**、**チャット変数／ツール（#xxx）**を組み合わ### :bulb: Tips：コンテキストの効果的な使い分け
 
----
+* **#file:ファイル名** … "特定ファイル参照"
 
-## 2. カスタマイズの種類と使い分け
+  * **明確にファイルを指定**したい場合に使用。
+  * **正確な対象**を指定でき、他のファイルとの混同を防ぐ。
 
-VS Code では以下の3つの方法でCopilotをカスタマイズできます：
+* **#codebase** … "自動検索ツール"
 
-| 種類 | 用途 | ファイル形式 | 適用範囲 | 使い分けのポイント |
-|------|------|-------------|----------|-------------------|
-| **`.github/copilot-instructions.md`** | 全般的なコーディング規約 | Markdown | ワークスペース全体 | • プロジェクト全体の基本ルール<br>• すべてのチャットに自動適用<br>• チーム共有が容易 |
-| **`.instructions.md`** | タスク・技術固有の指示 | Markdown | globパターンで指定 | • 特定ファイルタイプや領域の詳細ルール<br>• 条件付き自動適用<br>• 複数ファイルで分割管理 |
-| **`.prompt.md`** | 再利用可能なプロンプト | Markdown | 手動実行 | • 複雑なタスクの標準化<br>• 変数を使った柔軟な実行<br>• 頻繁に行う作業の効率化 |
+  * プロンプト内容に基づき**コード検索して該当スニペットを文脈注入**。
+  * **LLM 側が主導**のまま、**編集/エージェント等の他ツールとも併用可**。
+  * **関連ファイルを自動で見つけてくれる**ため、大規模なコードベースで便利。
 
-### 使い分けの指針
-
-**📝 基本ルール → `.github/copilot-instructions.md`**
-- プロジェクト全体で統一したいコーディング規約
-- 技術スタックの指定（React, TypeScript等）
-- 基本的なファイル構成やネーミング規則
-
-**🎯 専門領域 → `.instructions.md`**
-- フロントエンド/バックエンド固有のルール
-- テスト専用の指示
-- 特定のファイルパターンにのみ適用したい詳細ルール
-
-**🚀 作業効率化 → `.prompt.md`**
-- コンポーネント生成、API作成などの定型作業
-- コードレビュー、セキュリティチェックなどの検査作業
-- 複数のパラメータが必要な複雑なタスク
+* **推奨**：特定ファイルが分かっている場合は **#file**、広範囲な関連ファイルを探したい場合は **#codebase** を使用。設計・テスト・デバッグまで回せます。以下は最新仕様に合わせたまとめです。
 
 ---
 
-## 3. カスタム指示（Custom Instructions）
+## 1. チャット参加者
 
-### 3.1 カスタム指示の作成方法
+先頭に **`@`** を付けて、ドメインごとの“専門家”を呼び出します（拡張や MCP によって参加者が増える場合あり）。
 
-**手順：**
-![ツールの選択方法](../images/custom-instructions-activate.png)
-1. `github.copilot.chat.codeGeneration.useInstructionFiles` 設定を `true` に設定
-2. ワークスペースルートに `.github` フォルダを作成（存在しない場合）
-3. `.github/copilot-instructions.md` ファイルを作成
-4. Markdown形式で指示内容を記述
-
-### 3.2 ファイル構造
-
-#### `.github/copilot-instructions.md`
-```
-プロジェクトルート/
-├── .github/
-│   └── copilot-instructions.md  # 📝 全般的なコーディング規約
-└── ...
-```
-
-**ファイル内容の構造：**
-- **ヘッダー（必須）**: なし（Front Matter不要）
-- **本文**: Markdown形式で自然言語による指示
-- **フォーマット**: 見出し、リスト、コードブロックが利用可能
-- **適用範囲**: ワークスペース全体に自動適用
-
-### 3.3 導入方法
-
-カスタム指示ファイル（`.github/copilot-instructions.md`）を作成して、プロジェクト全体のコーディング規約を設定します。
-
-```markdown
-# プロジェクトのコーディング規約
-
-## TypeScript
-- 厳密な型定義を使用してください
-- 非同期処理には async/await を使用してください
-
-## React
-- 関数コンポーネントを使用してください
-- Tailwind CSS でスタイリングしてください
-
-## テスト
-- Jest と React Testing Library を使用してください
-```
-
-ファイルを保存すると、以降のすべてのチャットでこれらの指示が自動的に適用されます。
-
-> **💡 Tips: カスタム指示の自動生成**
->
-> VS Code の新機能として、**`チャット: ワークスペース指示ファイルを生成する`** コマンドが利用できます。このコマンドは、既存のコードベースを分析して、プロジェクトに最適化されたカスタム指示を自動生成します。
->
-> **使用方法:**
-> - **コマンドパレット**から `チャット: ワークスペース指示ファイルを生成する` を実行
-> ![Instructionsの作成](../images/generate-custom.png)
-> - または **チャットビュー**の「歯車アイコン」→「指示の生成」を実行
-> ![Instructionsの作成2](../images/generate-custom2.png)
->
-> **機能:**
-> - プロジェクトの構造、技術スタック、コーディングパターンを分析
-> - `.github/copilot-instructions.md` ファイルを自動作成
-> - 既存の指示ファイルがある場合は改善提案を生成
->
-> 生成された指示は、チームの特定のニーズに合わせてカスタマイズできます。
+| 参加者            | 役割（要点）                                                                 |
+| -------------- | ---------------------------------------------------------------------- |
+| **@github**    | GitHub のリポジトリ / Issue / PR などに関する質問。例: `@github What are my open PRs?` |
+| **@terminal**  | 統合ターミナルやシェルコマンド関連の質問。例: `@terminal list the 5 largest files`           |
+| **@vscode**    | VS Code の機能・設定・拡張 API についての質問。例: `@vscode how to enable word wrap?`    |
+| **@workspace** | 現在のワークスペース全般に関する質問。例: `@workspace how is authentication implemented?`  |
 
 ---
 
-## 4. Instructionsファイル（`.instructions.md`）
+## 2. スラッシュコマンド
 
-### 4.1 作成方法
+よく使う処理を **`/`** で即呼び出しできます（`/<prompt file name>` でプロンプトファイル実行も可能）。
 
-**手順：**
-1. **コマンドパレット**から `チャット: 手順の構成` を実行
-![Instructionsの作成](../images/instruction-create.png)
-1. または **チャットビュー**の「歯車アイコン」→「指示」→「新しい命令ファイル」
-![Instructionsの作成2](../images/instruction-create2.png)
-1. 保存場所を選択：
-   - **Workspace**: `.github/instructions/` フォルダ（ワークスペース固有）
-   - **User profile**: ユーザープロファイル（複数ワークスペース共通）
-2. ファイル名を入力（例：`typescript.instructions.md`）
-
-### 4.2 ファイル構造
-
-#### ディレクトリ構造
-```
-プロジェクトルート/
-├── .github/
-│   ├── copilot-instructions.md     # 📝 全般指示
-│   └── instructions/
-│       ├── backend.instructions.md  # 📝 バックエンド専用
-│       ├── frontend.instructions.md # 📝 フロントエンド専用
-│       └── testing.instructions.md  # 📝 テスト専用
-└── ...
-```
-
-#### ファイル内容の構造
-```markdown
----
-description: "TypeScript専用のコーディング指示"
-applyTo: "**/*.ts,**/*.tsx"
----
-
-# TypeScript専用指示
-
-## 型定義
-- 厳密な型定義を使用してください
-- any型の使用を禁止します
-
-## コーディングスタイル
-- セミコロンを必須とします
-```
-
-**構造要素：**
-- **Front Matter**（任意）:
-  - `description`: 指示ファイルの説明
-  - `applyTo`: 自動適用するファイルのglobパターン
-- **本文**: Markdown形式の指示内容
-
-### 4.2 Front Matter の設定項目
-
-| 項目 | 説明 | 例 |
-|------|------|-----|
-| `description` | 指示ファイルの説明文 | `"TypeScript専用のコーディング指示"` |
-| `applyTo` | 自動適用するファイルのglobパターン | `"**/*.ts,**/*.tsx"` |
-
-### 4.3 導入方法
-
-技術領域に特化したinstructionsファイルを作成します。
-
-**テスト専用指示ファイル（`testing.instructions.md`）:**
-```markdown
----
-description: "テスト作成時の指示"
-applyTo: "**/*.test.ts,**/*.spec.ts"
----
-
-# テスト作成指示
-
-## テストライブラリ
-- Jest と React Testing Library を使用
-
-## テスト内容
-- 正常系と異常系の両方をテスト
-- ユーザーの操作に基づいたテストを優先
-```
-
-このファイルを保存すると、テストファイル（`.test.ts`、`.spec.ts`）を編集する際に自動的に適用されます。
+| コマンド                      | 何をするか（要点）                        |
+| ------------------------- | -------------------------------- |
+| **/docs**                 | エディタのインラインチャットからドキュメンテーションコメント生成 |
+| **/explain**              | コード/ファイル/概念の説明                   |
+| **/fix**                  | エラー修正や改善提案                       |
+| **/help**                 | チャットの使い方ヘルプ                      |
+| **/tests**                | 選択/ファイルの関数・メソッドに対するテスト生成         |
+| **/setupTests**           | テストフレームワーク導入の推奨・手順・拡張提案          |
+| **/fixTestFailure**       | 失敗しているテストの直し方提案                  |
+| **/clear**                | Chat ビューの新規セッション開始               |
+| **/new**                  | ワークスペース/ファイルのスキャフォールド            |
+| **/newNotebook**          | 指示に基づき Jupyter Notebook を生成      |
+| **/search**               | 検索ビュー用クエリを自然言語から生成               |
+| **/startDebugging**       | `launch.json` を生成し、デバッグを開始       |
 
 ---
 
-## 5. Promptsファイル（`.prompt.md`）
+## 3. チャットツール
 
-### 5.1 作成方法
+**`#`** で文脈を明示。下表は **VS Code 組み込みツールの全一覧**（MCP や拡張のツールも追加可能）。
 
-**手順：**
-1. **コマンドパレット**から `チャット: プロンプトファイルの構成` を実行
-![Promptsの作成](../images/prompt-create.png)
-2. または **チャットビュー**の「歯車アイコン」→「プロンプト」→「新しいプロンプトファイル」
-![Promptsの作成](../images/prompt-create2.png)
-3. 保存場所を選択：
-   - **Workspace**: `.github/prompts/` フォルダ（ワークスペース固有）
-   - **User profile**: ユーザープロファイル（複数ワークスペース共通）
-4. ファイル名を入力（例：`refactor-typescript.prompt.md`）
+| 変数 / ツール                       | 説明                                        |
+| ------------------------------ | ----------------------------------------- |
+| **#changes**                   | ソース管理の変更一覧                                |
+| **#codebase**                  | コード検索で関連箇所を見つけ、スニペットを自動で文脈注入              |
+| **#createAndRunTask**          | 新しい **task** を作成して実行                      |
+| **#createDirectory**           | ディレクトリ作成                                  |
+| **#createFile**                | ファイル作成                                    |
+| **#edit** *(tool set)*         | ワークスペースへの編集を有効化                           |
+| **#editFiles**                 | ファイルに編集を適用                                |
+| **#editNotebook**              | Notebook を編集                              |
+| **#extensions**                | VS Code 拡張の検索/質問                          |
+| **#fetch**                     | 指定 URL の Web ページ内容を取得して文脈化                |
+| **#fileSearch**                | グロブでファイル検索してパスを返す                         |
+| **#findTestFiles**             | テストファイルの特定                                |
+| **#getNotebookSummary**        | Notebook セル一覧と詳細                          |
+| **#getProjectSetupInfo**       | 各種プロジェクトのスキャフォールド手順/設定案内                  |
+| **#getTaskOutput**             | 実行した **task** の出力取得                       |
+| **#getTerminalOutput**         | ターミナルコマンドの出力取得                            |
+| **#githubRepo**                | GitHub リポジトリ内でコード検索                       |
+| **#installExtension**          | 拡張機能インストール                                |
+| **#listDirectory**             | ディレクトリ内ファイル一覧                             |
+| **#new**                       | デバッグ/実行設定込みの新規ワークスペースを生成                  |
+| **#newJupyterNotebook**        | 説明に基づく Notebook 生成                        |
+| **#newWorkspace**              | 新しいワークスペース作成                              |
+| **#openSimpleBrowser**         | Simple Browser を開いてローカル Web アプリをプレビュー     |
+| **#problems**                  | Problems パネルの問題を文脈に追加                     |
+| **#readFile**                  | ファイル内容を読み取り                               |
+| **#readNotebookCellOutput**    | Notebook セルの実行結果取得                        |
+| **#runCell**                   | Notebook セルを実行                            |
+| **#runCommands** *(tool set)*  | ターミナルでコマンド実行＋出力取得を有効化                     |
+| **#runInTerminal**             | 統合ターミナルでシェルコマンド実行                         |
+| **#runNotebooks** *(tool set)* | Notebook セル実行を有効化                         |
+| **#runTask**                   | 既存の **task** を実行                          |
+| **#runTasks** *(tool set)*     | **tasks** 実行＆出力取得を有効化                     |
+| **#runTests**                  | ワークスペースのユニットテストを実行                        |
+| **#runVscodeCommand**          | 任意の VS Code コマンド実行（例: Zen モード有効化）         |
+| **#search** *(tool set)*       | ワークスペースのファイル検索を有効化                        |
+| **#searchResults**             | 検索ビューの結果を取得                               |
+| **#selection**                 | エディタの選択範囲（テキスト選択時のみ）                      |
+| **#terminalLastCommand**       | 直近のターミナルコマンドと出力                           |
+| **#terminalSelection**         | ターミナルの選択範囲                                |
+| **#testFailure**               | 失敗テスト情報（診断に有用）                            |
+| **#textSearch**                | テキスト検索                                    |
+| **#todos**                     | TODO の管理（`chat.todoListTool.enabled` が必要） |
+| **#usages**                    | 参照/実装/定義の複合（使われ方の調査に便利）                   |
+| **#VSCodeAPI**                 | VS Code の機能や拡張開発について質問                    |
 
-### 5.2 ファイル構造
+> 最新のショートカットコマンド一覧は [ドキュメント](https://code.visualstudio.com/docs/copilot/reference/copilot-vscode-features) に記載があるのでご覧ください。
 
-#### ディレクトリ構造
-```
-プロジェクトルート/
-├── .github/
-│   └── prompts/
-│       ├── refactor-typescript.prompt.md    # 📝 TypeScriptリファクタリング用
-│       ├── api-review.prompt.md             # 📝 API レビュー用
-│       └── security-check.prompt.md         # 📝 セキュリティチェック用
-└── ...
-```
-
-#### ファイル内容の構造
-```markdown
 ---
-mode: agent
-model: Claude Sonnet 4
-description: "TypeScriptファイルリファクタリングプロンプト"
-tools: ["editFiles", "problems", "codebase", "usages"]
----
+## 4. ショートカットコマンドの組み合わせ例
 
-# TypeScript ファイルのリファクタリング
+### 4-1. 既存ファイルの改善提案
 
-${file} ファイルをリファクタリングしてください。
-
-## リファクタリング観点
-- 型安全性の向上
-- パフォーマンスの最適化
-- 可読性・保守性の改善
-- DRY原則の適用
-```
-
-**構造要素：**
-- **Front Matter**（任意）:
-  - `mode`: チャットモード（`ask`, `edit`, `agent`）
-  - `model`: 使用するAIモデル
-  - `description`: プロンプトの説明
-  - `tools`: エージェントモードで使用可能なツール
-- **本文**: プロンプト内容（変数、他ファイル参照可能）
-
-### 5.2 Front Matter の設定項目
-
-| 項目 | 説明 | 例 |
-|------|------|-----|
-| `mode` | チャットモード | `"agent"`, `"ask"`, `"edit"` |
-| `model` | 使用するAIモデル | `"GPT-4.1"`, `"Claude Sonnet 4"` |
-| `description` | プロンプトの説明文 | `"TypeScriptファイルリファクタリングプロンプト"` |
-| `tools` | 使用可能なツール・ツールセット | `["editFiles", "problems"]` |
-
-### 5.3 導入方法
-
-TypeScriptファイルのリファクタリング用プロンプトファイルを作成します。
-
-**リファクタリング用プロンプト（`refactor-typescript.prompt.md`）:**
-```markdown
----
-mode: agent
-model: GPT-4.1
-description: "TypeScriptファイルリファクタリングプロンプト"
-tools: ["editFiles", "problems", "codebase"]
----
-
-# TypeScript ファイルのリファクタリング
-
-${file} ファイルをリファクタリングしてください。
-
-## リファクタリング観点
-- 型安全性の向上
-- パフォーマンスの最適化
-- 可読性・保守性の改善
-- DRY原則の適用
-
-## 具体的な改善項目
-1. any型の除去
-2. useCallback/useMemo の適用
-3. 重複コードの共通化
-4. エラーハンドリングの強化
-```
-
-### 5.4 プロンプトファイルの呼び出し方法
-
-作成したプロンプトファイルを実行するには、以下の3つの方法があります：
-
-#### 方法1: コマンドパレットから実行
-1. **コマンドパレット**（⇧⌘P / Ctrl+Shift+P）を開く
-2. `チャット: プロンプトを実行` コマンドを選択
-3. クイックピックからプロンプトファイルを選択
-
-#### 方法2: チャットビューで直接実行
-チャット入力欄で `/` に続けてプロンプトファイル名を入力：
+例題3で作成した `fizzbuzz.js` に対してエラーハンドリングを追加したい場合：
 
 ```
-/refactor-typescript
+/fix #file:fizzbuzz.js
+入力値の検証とエラーハンドリングを追加して
 ```
 
-**ファイルを指定してリファクタリング実行：**
+* **/fix** … エラー解消や改善案を提示
+* **#file:** … 対象ファイルを明示し"ズレ"を防止
+* 追加の指示で具体的な改善方向を明示
+
+### 4-2. 選択範囲でピンポイント修正
+
+例題3の `fizzbuzz.js` から特定の関数を選択して改善する場合：
+
+1. `fizzBuzz` 関数本体を選択 → 2) インラインチャット（⌘I / Ctrl+I） → 3) 入力:
+
 ```
-/refactor-typescript #file:src/components/TodoApp.tsx
+/fix #selection
+この関数をより効率的なアルゴリズムに書き直して
 ```
 
-#### 方法3: エディタの再生ボタンから実行
-1. プロンプトファイルをエディタで開く
-2. エディタタイトルエリアの**再生ボタン**をクリック
-3. 現在のチャットセッションまたは新しいチャットセッションを選択
-![エディタの再生ボタン](../images/editor-play-button.png)
+* **#selection** で過剰な広がりを防ぎ、**/fix** で修正提案
 
-> **💡 Tips**: エディタから実行する方法は、プロンプトファイルのテストや反復改善に特に便利です。
+### 4-3. テスト生成と失敗テストの修正
+
+例題3で作成した `fizzbuzz.js` に対してテスト追加：
+
+```
+/tests #file:fizzbuzz.js
+エッジケース（0、負の数、非数値）も含めて
+```
+
+失敗したテストがある場合：
+
+```
+/fixTestFailure #testFailure
+```
+
+* **/tests** でテスト生成、**/fixTestFailure** で失敗修正案
 
 ---
 
-## 6. 実践的な使用パターン
+### :bulb: Tips：@workspace と #codebase の違い
 
-### 6.1 チーム標準の共有
+* **@workspace** … “参加者”
 
-**推奨ディレクトリ構造:**
-```
-.github/
-├── copilot-instructions.md           # 📝 全般的なコーディング規約
-├── instructions/
-│   ├── backend.instructions.md       # 📝 バックエンド専用指示
-│   ├── frontend.instructions.md      # 📝 フロントエンド専用指示
-│   ├── testing.instructions.md       # 📝 テスト専用指示
-│   └── database.instructions.md      # 📝 データベース専用指示
-└── prompts/
-    ├── refactor-typescript.prompt.md    # 📝 TypeScriptリファクタリング用
-    ├── create-component.prompt.md       # 📝 コンポーネント作成用
-    ├── code-review.prompt.md            # 📝 コードレビュー用
-    └── security-check.prompt.md         # 📝 セキュリティチェック用
-```
+  * **プロンプトの主導権**を取り、コードベース知識で回答する専用参加者。
+  * **他ツールは呼べず**、**Ask モードのみ**で利用。
+* **#codebase** … “ツール（検索）”
 
-### 6.2 段階的導入のベストプラクティス
-
-**フェーズ1**: 基本的なカスタム指示
-1. `.github/copilot-instructions.md` で基本ルールを設定
-2. プロジェクト全体に適用される最低限の規約を記述
-
-**フェーズ2**: 専門分野別の指示
-1. `frontend.instructions.md`, `backend.instructions.md` を作成
-2. 技術領域ごとの詳細な指示を分割
-
-**フェーズ3**: タスク別プロンプト
-1. 頻繁に行うタスク用の `.prompt.md` ファイルを作成
-2. チーム内で共通化できるプロンプトを蓄積
-
-### :memo: 練習
-
-1. **基本設定**: `.github/copilot-instructions.md` を作成し、基本的なコーディング規約を設定してください
-
-2. **専門指示**: `.instructions.md` ファイルを作成してください
-   - テスト用
-   - 使用している技術スタック用
-
-3. **再利用プロンプト**: `.prompt.md` ファイルを作成してください
-   - TypeScriptリファクタリング用
-
-4. **動作確認**: 作成したファイルが正しく機能することを確認してください
+  * プロンプト内容に基づき**コード検索して該当スニペットを文脈注入**。
+  * **LLM 側が主導**のまま、**編集/エージェント等の他ツールとも併用可**。
+* **推奨**：柔軟性が高い **#codebase の利用が推奨**。
 
 ---
 
-## 7. まとめ
+## :memo: 練習
 
-Copilotカスタマイゼーションの3つのアプローチ：
+以下の課題で実際にショートカットコマンドを組み合わせて使ってみましょう：
 
-| ファイルタイプ | 用途 | 作成方法 | 実践ポイント |
-|---------------|------|----------|-------------|
-| **`.github/copilot-instructions.md`** | 全般的なコーディング規約 | 手動作成またはワークスペース生成 | • プロジェクト全体の基本ルール<br>• 自動適用<br>• チーム共有しやすい |
-| **`.instructions.md`** | タスク・技術固有の指示 | コマンドパレットまたはチャットUI | • globパターンで自動適用<br>• 複数ファイルで分割管理<br>• ワークスペース/ユーザー別 |
-| **`.prompt.md`** | 再利用可能なプロンプト | コマンドパレットまたはチャットUI | • 変数使用可能<br>• 手動実行<br>• 複雑なタスクの標準化 |
+1. **基本的な組み合わせ**
+   - 例題3で作成した `fizzbuzz.js` に対して `/explain #file:fizzbuzz.js` でコード解説を依頼
+   - `/fix #file:fizzbuzz.js` でコード改善提案を取得
 
-**成功のポイント:**
-- **段階的導入**: 基本→専門→タスク別の順で導入
-- **チーム標準化**: バージョン管理でファイルを共有
-- **継続的改善**: 使用状況に応じて指示を調整
-- **適切な分割**: 1ファイル1目的で管理しやすく
+2. **選択範囲を活用した修正**
+   - `fizzbuzz.js` の特定の関数を選択して `/fix #selection` で局所的な改善
+   - 問題のあるコード部分を選択して `/explain #selection` で問題点を分析
+
+3. **テスト関連の組み合わせ**
+   - `/tests #file:fizzbuzz.js` でテストファイル生成
+   - テストが失敗した場合は `/fixTestFailure #testFailure` で修正案を取得
+
+4. **実践的な応用**
+   - `/search #codebase` で関連コードを検索し、コンテキストを増やして質問
+   - `#changes` と組み合わせて変更内容を解説してもらう
+
+> **💡 コツ**: 複数のツールを組み合わせることで、より精度の高い回答や提案を得ることができます。特定ファイルが分かっている場合は `#file`、広範囲な関連ファイルを探したい場合は `#codebase` を使い分けましょう。
+
+---
+
+## まとめ
+
+* **@xxx（参加者）**：GitHub / Terminal / VS Code / Workspace など**領域専門家**を呼び出す
+* **/xxx（スラッシュコマンド）**：**説明・修正・テスト・検索・デバッグ開始**まで一発呼び出し
+* **#xxx（変数／ツール）**：**ファイル・選択範囲・変更・失敗テスト・検索**等を**文脈に添付**。`#codebase` で自動コード検索が便利
+

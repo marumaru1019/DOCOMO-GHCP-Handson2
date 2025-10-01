@@ -1,213 +1,428 @@
 ---
-title: ② 新規機能の設計
-categories: [技術者向け, GitHub Copilot応用]
-tags: [設計, 要件定義, アーキテクチャ, API設計]
+title: ② ツール
+categories: [GitHub Copilot, Agent Mode]
 weight: 2
 ---
 
-GitHub Copilotを活用して新規機能の設計を効率的に行う方法を学びます。要件定義から技術設計、実装計画まで、Copilotとの対話を通じて体系的にアプローチしていきます。
+## 1. ツールとは？
 
-今回は「Todo削除確認モーダル機能」を例に、実際の開発現場で必要となる設計プロセスを実践します。
+GitHub Copilot のチャットでは、**`#`ツール名**を使って便利な機能を呼び出すことができます。
+これらは「ツール」と呼ばれ、コードに関する情報を簡単に取得したり、様々な作業を自動化したりできます。
+
+**身近な例で説明すると：**
+- `#selection` → 今選択しているコードについて質問
+- `#terminalSelection` → ターミナルのエラーメッセージについて質問
+- `#fetch` → ウェブサイトの内容を取得して分析
+
+> **ポイント**
+>
+> * **チャット変数の参照** … `#-mention構文`で関連コンテキストを効率的に参照
+> * **Agent mode での自動実行** … 自律的なコーディングワークフローで必要に応じてツールが実行される
+> * **拡張機能とMCPサーバー** … 追加のツールを提供し、チャットプロンプトで利用可能
 
 ---
 
-## 1. 要件定義フェーズ
+## 2. 利用可能なツール一覧
 
-### :pen: 例題
-
-次のプロンプトを入力して、要件定義を進めます。
-
-```text
-#codebase
-
-Todo削除確認モーダル機能を追加したいです。
-基本的な機能要件と想定される利用シーンを教えてください。
-出力は要件定義.mdに記載してください。
-```
-
-> 💡 **Tips**: デザイン画像やモックアップがある場合は、画像ファイルを添付して以下のように依頼すると、より具体的で実装しやすい仕様を作成できます：
->
-> **画像の添付方法：**
-> - VS Codeのチャットビューに画像ファイルをドラッグ&ドロップ
-> - クリップボードから画像を直接コピー&ペースト
-> - 添付ボタン（📎）から画像ファイルを選択
->
-> ↓添付する画像
->
-> ![画像を添付](../images/todo-delete-modal-design.png)
->
-> ```text
-> #codebase
->
-> 添付したモーダルのデザイン画像を参考に、Todo削除確認モーダル機能を追加したいです。
-> デザインに沿った機能要件と技術仕様を教えてください。
-> 出力は要件定義.mdに記載してください。
-> ```
-
-### :robot: 出力例
-
-```markdown
-## Todo削除確認モーダル機能 要件定義
-
-### 基本機能
-- **削除ボタンクリック時**: 確認モーダルを表示
-- **モーダル内容**: Todoタイトル表示 + 「削除しますか？」メッセージ
-- **ユーザー選択**: 「削除する」または「キャンセル」ボタン
-- **削除実行**: モーダルを閉じてTodoを削除
-
-### 利用シーン
-- **誤操作防止**: 重要なTodoの意図しない削除を防ぐ
-- **確認プロセス**: 削除前にユーザーが内容を再確認できる
-- **安心感**: 取り消せない操作であることを明示
-
-### 期待効果
-- 誤削除の大幅減少
-- ユーザー体験の向上
-- データ保護の強化
-```
-
-> 💡 **補足**: さらに詳細な要件定義には、レスポンシブ対応、アクセシビリティ要件、パフォーマンス基準、ユーザーストーリーなどの観点を含めるとより包括的な設計ができます。
+| ツール                          | 目的・説明                            |
+| ---------------------------- | -------------------------------- |
+| `#changes`                   | Git 変更一覧を取得し、差分を参照に会話            |
+| `#codebase`                  | ワークスペース全体をコード検索して関連箇所を抽出         |
+| `#editFiles`                 | ファイルの新規作成・編集を行うツールセット            |
+| `#extensions`                | VS Code 拡張機能を検索・質問               |
+| `#fetch`                     | 指定 URL の HTML/JSON などを取得して内容を利用  |
+| `#findTestFiles`             | テストファイルを検索して一覧化                  |
+| `#githubRepo`                | GitHub 上の公開リポジトリをコード検索           |
+| `#new`                       | 新しい VS Code ワークスペースをスキャフォールド     |
+| `#openSimpleBrowser`         | VS Code 内ブラウザでローカル Web アプリをプレビュー |
+| `#problems`                  | Problems パネルのエラー・警告を取得           |
+| `#readCellOutput`            | Notebook のセル出力を読み取り              |
+| `#runCommands`               | ターミナルコマンドを実行し出力を取得               |
+| `#runNotebooks`              | Notebook のセルを実行し出力を取得            |
+| `#runTasks`                  | `tasks.json` に定義したタスクを実行         |
+| `#runTests`                  | テストスイートを実行し結果を取得                 |
+| `#search` / `#searchResults` | ワークスペース内のファイル検索＆結果取得             |
+| `#selection`                 | エディタで選択中のテキストをコンテキスト追加           |
+| `#terminalSelection`         | ターミナルで選択中のテキスト（コマンドなど）を追加        |
+| `#terminalLastCommand`       | 直近で実行したターミナルコマンドを追加              |
+| `#testFailure`               | テスト失敗情報をコンテキストに追加                |
+| `#usages`                    | シンボル参照・実装・定義情報をまとめて取得            |
+| `#VSCodeAPI`                 | VS Code 拡張 API のリファレンスを検索        |
 
 ---
 
-## 2. 技術設計フェーズ
+## 3. 具体的なツールの使い方
 
 ### :pen: 例題
 
-要件が整理できたら、技術設計を進めます。
+よく使うツールの実際の使い方を見てみましょう。
+
+### 💡 シナリオ1：ターミナルでエラーが出た時
+
+**状況：** ターミナルでコマンドを実行したらエラーメッセージが表示された
+
+**やり方：**
+1. ターミナルのエラーメッセージをマウスで選択
+2. チャットに以下のように入力
 
 ```text
-Todo削除確認モーダルの技術設計を作成してください。
-必要なコンポーネントと状態管理の方針を教えてください。
-出力は技術設計.mdに記載してください。
+#terminalSelection このエラーを解決する方法を教えて
+```
+
+**結果：** Copilotがエラーの原因と解決方法を詳しく説明してくれます
+
+---
+
+### 💡 シナリオ2：React公式サイトの情報が知りたい時
+
+**状況：** Reactの最新情報をチェックしたい
+
+**やり方：**
+```text
+#fetch https://react.dev Reactの最新バージョンについて教えて
+```
+
+**結果：** React公式サイトから最新バージョンの情報を取得し、要約してくれます
+
+### 💡 シナリオ3：Next.jsのスタイリングライブラリを調べたい時
+
+**状況：** Next.jsで使えるスタイリングライブラリの選択肢を知りたい
+
+**やり方：**
+```text
+#githubRepo nextjsで使用できるスタイリング用のライブラリで使えそうなものをいくつか教えて
+```
+
+**結果：** Next.jsエコシステムから人気のスタイリングライブラリ（Tailwind CSS、Styled Components、Chakra UI等）とその特徴を教えてくれます
+
+## 4. 分からない時は直接聞こう
+
+**使い方が分からないツールがある時は、直接聞いてみましょう**
+
+```text
+#terminalSelection このツールの使い方を教えて
+```
+
+どのツールでも「このツールの使い方を教えて」と聞けば、詳しい説明をしてくれます。
+
+---
+
+## 5. Agent mode でのツール制御
+
+Agent mode では、使用するツールを制御できます。
+
+
+**Tool Pickerの使い方：**
+![ツールの選択方法](../images/tool_select.png)
+1. Agent mode のチャット入力欄右端の 🔧 アイコンをクリック
+2. 使いたいツールだけにチェックを入れる
+
+これにより、Agent mode が自動で作業する際に使用するツールを制限できます。
+
+---
+
+## 6. MCPサーバーでツールを拡張する
+
+### 6.1 MCP とは
+
+MCP（Model Context Protocol）は、**AIと外部システム（API/DB/ファイル/クラウド等）を安全に接続するための標準プロトコル**です。VS Code の Copilot Chat に MCP サーバーを追加すると、そのサーバーが提供する"ツール"が **Tool Picker** に現れ、Agent mode から呼び出せます。
+
+### 6.2 導入メリット
+
+* **手作業のコマンド/API呼び出しを会話化**（例：GitHubやAzure操作）
+* **再利用・持ち運びが効く**：MCPはクライアント非依存（VS Code/JetBrains/Visual Studio 等）で同じサーバーを使い回せる
+* **構成の見える化**：`mcp.json` で「どのツールを使って良いか」を明文化し、リポジトリに同梱可能
+
+### 6.3 ソース
+[公式サンプル集](https://github.com/modelcontextprotocol/servers/tree/main) に、どんな MCP サーバーが使えるのかの一覧が記載しているので御覧ください。
+
+### :pen: 例題：Azure MCP ServerでBicepテンプレート作成
+
+**目的：** Storage AccountのBicepテンプレートを最新のAPI仕様で作成したい
+
+**手順：**
+
+1. [拡張機能のリンク](vscode:extension/ms-azuretools.vscode-azure-mcp-server) を開いてインストール
+   ![Azure MCP Server 拡張機能](../images/azuremcp.png)
+
+2. **Copilot Chat → Agent** を選択し、🔧 **Tools** で "Azure MCP Server" のツールを有効化
+   ![Azure MCP Server 有効化](../images/azuremcpactivate.png)
+
+3. チャットに以下のプロンプトを入力：
+
+```text
+#bicepschema
+最新のapiVersionでStorage AccountのBicepテンプレートを作成してください。
+
+要件：
+- SKU: Standard_LRS
+- 既存VNet統合は不要
+- 冪等性を保つ設計
+- 説明コメントも含める
+
 ```
 
 ### :robot: 出力例
 
-```markdown
-# Todo削除確認モーダル 技術設計
+Azure MCP Serverが最新のAPI仕様を取得し、以下のようなBicepテンプレートを生成：
 
-## 新規作成コンポーネント
+```bicep
+// ============================================================================
+// Storage Account Bicep Template
+// ============================================================================
+// このテンプレートは、Azure Storage Accountを作成します。
+// 最新のAPI Version: 2025-01-01を使用しています。
+//
+// 主な機能:
+// - Standard_LRS SKUによるローカル冗長ストレージ
+// - HTTPS通信の強制
+// - TLS 1.2以上の要求
+// - 階層型名前空間(HNS)の有効化オプション
+// - パブリックアクセスの制御
+// - 冪等性の保証（既存リソースがあっても安全にデプロイ可能）
+// ============================================================================
 
-### DeleteConfirmModal
-interface DeleteConfirmModalProps {
-  isOpen: boolean;
-  todoTitle: string;
-  onConfirm: () => void;
-  onCancel: () => void;
+// ----------------------------------------------------------------------------
+// パラメータ定義
+// ----------------------------------------------------------------------------
+
+@description('Storage Accountの名前（グローバルに一意である必要があります）')
+@minLength(3)
+@maxLength(24)
+param storageAccountName string
+
+@description('Storage Accountをデプロイするリージョン')
+param location string = resourceGroup().location
+
+@description('Storage AccountのSKU（Standard_LRS: ローカル冗長ストレージ）')
+@allowed([
+  'Standard_LRS'
+  'Standard_GRS'
+  'Standard_RAGRS'
+  'Standard_ZRS'
+  'Premium_LRS'
+  'Premium_ZRS'
+  'Standard_GZRS'
+  'Standard_RAGZRS'
+])
+param skuName string = 'Standard_LRS'
+
+@description('Storage Accountの種類')
+@allowed([
+  'Storage'
+  'StorageV2'
+  'BlobStorage'
+  'FileStorage'
+  'BlockBlobStorage'
+])
+param kind string = 'StorageV2'
+
+@description('アクセス層（Hot: 頻繁なアクセス、Cool: 低頻度アクセス）')
+@allowed([
+  'Hot'
+  'Cool'
+])
+param accessTier string = 'Hot'
+
+@description('階層型名前空間の有効化（Data Lake Storage Gen2機能）')
+param enableHierarchicalNamespace bool = false
+
+@description('パブリックネットワークアクセスの許可設定')
+@allowed([
+  'Enabled'
+  'Disabled'
+])
+param publicNetworkAccess string = 'Enabled'
+
+@description('Blob のパブリックアクセスを許可するかどうか')
+param allowBlobPublicAccess bool = false
+
+@description('共有キーアクセスを許可するかどうか（false推奨：Managed Identity使用）')
+param allowSharedKeyAccess bool = true
+
+@description('最小TLSバージョン')
+@allowed([
+  'TLS1_0'
+  'TLS1_1'
+  'TLS1_2'
+  'TLS1_3'
+])
+param minimumTlsVersion string = 'TLS1_2'
+
+@description('HTTPSトラフィックのみを許可するかどうか')
+param supportsHttpsTrafficOnly bool = true
+
+@description('リソースタグ')
+param tags object = {
+  Environment: 'Production'
+  ManagedBy: 'Bicep'
+  CreatedDate: '2025-10-01'
 }
 
-## 既存コンポーネント修正
+// ----------------------------------------------------------------------------
+// 変数定義
+// ----------------------------------------------------------------------------
 
-### TodoItem.tsx
-- 削除ボタンクリック時に確認モーダルを表示
-- `onRequestDelete` プロパティを追加
+// ネットワークルールのデフォルト設定
+var networkAcls = {
+  bypass: 'AzureServices'
+  defaultAction: publicNetworkAccess == 'Disabled' ? 'Deny' : 'Allow'
+  ipRules: []
+  virtualNetworkRules: []
+}
 
-### TodoApp.tsx
-- モーダル表示状態を管理
-- 削除確認・キャンセル処理を実装
+// ----------------------------------------------------------------------------
+// リソース定義
+// ----------------------------------------------------------------------------
 
-## 状態管理
-- **ローカル状態**: TodoApp内でモーダル状態を管理
-- **理由**: 機能が局所的で他コンポーネントに影響しない
-- **状態**: `{ isOpen: boolean, todoId: string, todoTitle: string }`
+@description('Azure Storage Account')
+resource storageAccount 'Microsoft.Storage/storageAccounts@2025-01-01' = {
+  name: storageAccountName
+  location: location
+  tags: tags
 
-## 実装ポイント
-- Tailwind CSSでスタイリング
-- ESCキーでモーダルクローズ
-- 条件付きレンダリングでパフォーマンス最適化
+  // SKU設定（冗長性レベル）
+  sku: {
+    name: skuName
+  }
+
+  // Storage Accountの種類
+  kind: kind
+
+  // プロパティ設定
+  properties: {
+    // アクセス層の設定（BlobStorageまたはStorageV2の場合に有効）
+    accessTier: accessTier
+
+    // HTTPSトラフィックのみを許可
+    supportsHttpsTrafficOnly: supportsHttpsTrafficOnly
+
+    // 最小TLSバージョンの設定
+    minimumTlsVersion: minimumTlsVersion
+
+    // 階層型名前空間の有効化（Data Lake Storage Gen2）
+    isHnsEnabled: enableHierarchicalNamespace
+
+    // パブリックネットワークアクセスの制御
+    publicNetworkAccess: publicNetworkAccess
+
+    // Blobのパブリックアクセス制御
+    allowBlobPublicAccess: allowBlobPublicAccess
+
+    // 共有キーアクセスの制御（Managed Identity推奨）
+    allowSharedKeyAccess: allowSharedKeyAccess
+
+    // クロステナントレプリケーションの制御（セキュリティ強化）
+    allowCrossTenantReplication: false
+
+    // デフォルト認証をOAuthに設定（セキュリティ強化）
+    defaultToOAuthAuthentication: true
+
+    // ネットワークACLの設定
+    networkAcls: networkAcls
+
+    // 暗号化設定（デフォルトでMicrosoft管理キーを使用）
+    encryption: {
+      services: {
+        blob: {
+          enabled: true
+          keyType: 'Account'
+        }
+        file: {
+          enabled: true
+          keyType: 'Account'
+        }
+        table: {
+          enabled: true
+          keyType: 'Account'
+        }
+        queue: {
+          enabled: true
+          keyType: 'Account'
+        }
+      }
+      keySource: 'Microsoft.Storage'
+      requireInfrastructureEncryption: false
+    }
+  }
+}
+
+// ----------------------------------------------------------------------------
+// 出力
+// ----------------------------------------------------------------------------
+
+@description('作成されたStorage AccountのリソースID')
+output storageAccountId string = storageAccount.id
+
+@description('作成されたStorage Accountの名前')
+output storageAccountName string = storageAccount.name
+
+@description('Blob Serviceのプライマリエンドポイント')
+output blobEndpoint string = storageAccount.properties.primaryEndpoints.blob
+
+@description('File Serviceのプライマリエンドポイント')
+output fileEndpoint string = storageAccount.properties.primaryEndpoints.file
+
+@description('Queue Serviceのプライマリエンドポイント')
+output queueEndpoint string = storageAccount.properties.primaryEndpoints.queue
+
+@description('Table Serviceのプライマリエンドポイント')
+output tableEndpoint string = storageAccount.properties.primaryEndpoints.table
+
+@description('Storage Accountのプライマリロケーション')
+output primaryLocation string = storageAccount.properties.primaryLocation
+
 ```
 
-> � **補足**: より詳細な設計では、アクセシビリティ対応（ARIA属性、フォーカス制御）、レスポンシブ対応、アニメーション実装、エラーハンドリングなどの観点を含めると堅牢な設計になります。
+**操作：**
+1. 提案されたBicepテンプレートを確認
+2. 必要に応じて「セキュリティをより強化して」等の追加指示
+3. Agent modeが自動的に `#editFiles` ツールでファイル作成
 
----
+### 💡 その他の活用例
 
-## 3. 実装計画フェーズ
-
-### :pen: 例題
-
-技術設計が完了したら、実装計画を立てます。
-
+**APIバージョン確認：**
 ```text
-Todo削除確認モーダルの実装計画を作成してください。
-タスクの分解と実装順序を教えてください。
-出力は実装計画.mdに記載してください。
+#bicepschema
+Microsoft.KeyVault/vaults の最新 apiVersion を教えて
 ```
 
-### :robot: 出力例
-
-```markdown
-## 実装計画
-
-### 1. タスク分解（実装順序）
-
-#### Step 1: 基盤作成 (2時間)
-1. **DeleteConfirmModal コンポーネント作成**
-   - モーダルUI実装
-   - Props インターフェース定義
-
-2. **TodoItem 修正**
-   - 削除ボタンの処理変更
-   - 確認モーダル表示処理
-
-#### Step 2: 統合・テスト (1時間)
-1. **TodoApp 修正**
-   - モーダル状態管理追加
-   - 削除確認・キャンセル処理
-
-2. **動作確認**
-   - 削除フロー全体テスト
-   - エッジケース確認
-
-### 2. 想定リスク
-- **モーダルの表示位置**: z-index の競合 → Tailwind の z-50 使用で回避
-- **キーボード操作**: ESCキー対応漏れ → 初期実装で対応
-
-### 3. テスト項目
-- モーダル表示・非表示
-- 削除実行・キャンセル動作
-- キーボード操作（ESCキー）
-
-### 4. 完了基準
-- 削除確認モーダルが正常に動作
-- ESLint エラーなし
-- 基本的なテストケースをパス
+**スキーマ情報取得：**
+```text
+#bicepschema
+Microsoft.KeyVault/vaults のスキーマ情報を教えて
 ```
 
-> 💡 **補足**: より詳細な計画では、工数見積もり、リスク分析の詳細化、包括的なテスト戦略、コードレビューポイント、パフォーマンス基準などの観点を含めると実装品質が向上します。
+> **補足：** Azure MCP Serverには Azure CLI 実行ツールも含まれており、既存リソースの状態確認や前提調査も会話で実行できます。
 
 ---
 
 ## :memo: 練習
 
-1. **他の機能で試す**
-   - Todo編集機能の設計
-   - カテゴリ追加機能の要件定義
-   - エクスポート機能の技術設計
+以下の練習で実際にツールを使ってみましょう：
 
-2. **設計の見直し**
-   - 要件に漏れがないか再確認
-   - より良い技術選択肢の検討
-   - 実装優先度の再評価
+1. **エラー解析の練習**
+   何かコマンドを実行してエラーを出し、`#terminalSelection`で解決方法を聞いてみる
 
-3. **チーム開発視点**
-   - 複数人での作業分担
-   - レビュープロセスの最適化
-   - ドキュメント品質の向上
+2. **情報収集の練習**
+   `#fetch`で好きなウェブサイトの情報を取得・要約してもらう
 
-4. **段階的計画**
-   - MVP (最小実行可能製品) の定義
-   - 段階的リリース計画
-   - ユーザーフィードバック収集
+3. **コード研究の練習**
+   `#githubRepo`で興味のあるプロジェクトのコードを検索してもらう
 
-> 設計フェーズでの十分な検討は、後の実装・テスト工程での手戻りを大幅に削減します。Copilotを活用して多角的な視点から機能を分析し、堅牢な設計を心がけましょう。
+4. **MCP拡張の練習（上級者向け）**
+   - `.vscode/mcp.json` を作成してシンプルなMCPサーバーを追加してみる
+   - Tool Pickerで新しいツールが表示されることを確認する
 
 ---
 
-## まとめ
+## 7. まとめ
 
-* **体系的な設計プロセス**により要件定義→技術設計→実装計画の流れを効率化
-* **デザイン画像の活用**でより具体的で実装しやすい仕様書を作成可能
-* **段階的なアプローチ**で複雑な機能も管理可能な単位に分解
-* **リスク分析と対策**により実装時の問題を事前に回避
-* **Copilotとの対話**を通じて多角的な視点から設計品質を向上
+* **`#`記号** でツールを簡単に呼び出せる
+* **シナリオ別** に使い分けることで効率的な開発が可能
+* **分からない時は直接聞く** ことで新しいツールも覚えやすい
+* **Agent mode** では自動でツールが選択されるが、Tool Pickerで制御も可能
+* **MCPサーバー** で外部システム連携ツールを追加可能（Azure、GitHub等）
+* **実際に使ってみる** ことで、各ツールの便利さが実感できる
+
+> MCPサーバーを活用することで、GitHub Copilotの基本ツールを大幅に拡張し、プロジェクト固有のワークフローに最適化された開発環境を構築できます。
