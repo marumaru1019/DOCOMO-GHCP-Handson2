@@ -117,14 +117,14 @@ JWT トークンによる認証が必要です。
 1. **エンドポイントの確認**
    ```text
    #file:../helpdesk-backend/app/routers/tickets.py
-   
+
    このファイルのエンドポイント定義と、生成されたapi-overview.context.mdのチケットエンドポイント一覧を比較してください。相違点があれば指摘してください。
    ```
 
 2. **レスポンススキーマの確認**
    ```text
    #file:../helpdesk-backend/app/schemas/ticket.py
-   
+
    Pydanticスキーマと、ドキュメントのレスポンス形式が一致しているか確認してください。
    ```
 
@@ -235,38 +235,6 @@ USERS, TICKETS, COMMENTS, TEAMS, CATEGORIES, TAGS, ARTICLES
 
 ---
 
-## 4. コンテキストファイルの活用方法
-
-コンテキストファイルを作成したら、以下の方法で GitHub Copilot に参照させます。
-
-### 4.1 プロンプトでの直接参照
-
-```text
-#file:docs/context/api-overview.context.md を参照して、チケット一覧取得のAPIクライアント関数を実装してください。
-```
-
-### 4.2 カスタムインストラクションでの参照
-
-`.github/copilot-instructions.md` に記載して、常に参照可能にします：
-
-```markdown
-## 利用可能なリソース
-- API概要: `#file:docs/context/api-overview.context.md`
-- 認証フロー: `#file:docs/context/auth-flow.context.md`
-```
-
-### 4.3 パス別インストラクションでの参照
-
-特定のファイルパターンに適用されるインストラクションで参照します：
-
-```markdown
----
-applyTo: "**/lib/api-client.ts"
----
-実装前に [API概要](../../docs/context/api-overview.context.md) を確認
-```
-
----
 
 ## :memo: 練習
 
@@ -281,7 +249,7 @@ applyTo: "**/lib/api-client.ts"
    ```text
    #file:../helpdesk-backend/app/routers/tickets.py
    #file:docs/context/api-overview.context.md
-   
+
    このファイルのエンドポイント定義と、api-overview.context.mdのチケットエンドポイント一覧を比較してください。相違点があれば指摘してください。
    ```
 
@@ -294,7 +262,7 @@ applyTo: "**/lib/api-client.ts"
 1. **フロントエンドでの実装**
    ```text
    #file:../helpdesk-backend/docs/context/api-specification.context.md
-   
+
    チケット更新機能を実装してください。PUT /tickets/{ticket_id} を呼び出すAPIクライアント関数を作成してください。
    ```
 
@@ -302,7 +270,7 @@ applyTo: "**/lib/api-client.ts"
    ```text
    #file:lib/types.ts
    #file:../helpdesk-backend/app/schemas/ticket.py
-   
+
    フロントエンドのTicket型と、バックエンドのPydanticスキーマが一致しているか確認してください。
    ```
 

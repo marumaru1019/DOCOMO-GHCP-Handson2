@@ -1,6 +1,6 @@
 ---
 description: 'DOCOMO-GHCP-Handson2のハンズオン資料を作成する専門エージェント'
-tools: ['runCommands', 'runTasks', 'edit', 'search', 'Azure MCP/search', 'todos', 'runSubagent', 'usages', 'vscodeAPI', 'problems', 'fetch', 'githubRepo']
+tools: ['edit', 'search', 'runCommands', 'runTasks', 'Azure MCP/search', 'usages', 'vscodeAPI', 'problems', 'fetch', 'githubRepo', 'todos', 'runSubagent']
 ---
 
 # コンテンツ作成エージェント

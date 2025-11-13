@@ -78,8 +78,8 @@ description: ユーザーの要望を要件定義に変換する（技術要素�
 作成日: YYYY-MM-DD
 
 ## ユーザーストーリー
-**As a** [役割（例: サポート担当者）]  
-**I want to** [実現したいこと（例: チケットを検索できる）]  
+**As a** [役割（例: サポート担当者）]
+**I want to** [実現したいこと（例: チケットを検索できる）]
 **So that** [目的（例: 目的のチケットを素早く見つけられる）]
 
 ## 受け入れ条件
@@ -319,115 +319,6 @@ description: 実装されたコードを品質観点でレビューし、改善�
 
 ---
 
-### :pen: 例題5 - update-context.prompt.md（コンテキスト更新ワークフロー）
-
-実装計画書と変更内容を照合し、関連するコンテキストファイル（example-2.md 参照）を自動更新するワークフローです。
-
-**ファイル:** `.github/prompts/update-context.prompt.md`
-
-````markdown
----
-mode: architect
-description: 実装内容をコンテキストファイルに自動反映する
----
-
-# コンテキスト更新ワークフロー
-
-## Steps
-
-### Step 1: Context Loading
-以下の情報を収集:
-
-1. **実装計画書の確認**
-   - `[仕様書フォルダ]/[機能名]/[機能名].plan.md` を読み込み
-
-2. **変更内容の確認**
-   - `#changes` で実装済みの変更を確認
-
-3. **既存コンテキストファイルの読み込み**
-   - `docs/context/api-specification.context.md`
-   - `docs/context/auth-flow.context.md`
-   - `docs/context/database-schema.context.md`
-   - その他プロジェクト固有のコンテキストファイル
-
-### Step 2: Analysis & Identification
-実装計画書と変更内容を分析し、更新が必要なコンテキストファイルを特定:
-
-1. **API変更の検出**
-   - 新しいエンドポイント、パラメータ、レスポンス形式の追加
-   - → `api-specification.context.md` を更新
-
-2. **認証要件の確認**
-   - 保護されたルートの追加
-   - → `auth-flow.context.md` を更新
-
-3. **データベース変更の検出**
-   - テーブル追加、カラム追加、インデックス追加
-   - → `database-schema.context.md` を更新
-
-4. **その他の変更**
-   - アーキテクチャ変更、新しいパターン導入など
-
-### Step 3: Structured Output
-更新内容をレビュー可能な形式で提示:
-
-\```markdown
-## 📋 コンテキストファイル更新計画
-
-### 更新対象ファイル
-
-#### 1. api-specification.context.md
-**更新箇所:**
-- GET /tickets エンドポイント
-  - 追加: クエリパラメータ `search` (string, optional)
-  - 説明: チケットタイトルの部分一致検索
-  - 例: `GET /tickets?search=ログイン`
-
-#### 2. database-schema.context.md
-**更新箇所:**
-- tickets テーブル
-  - 追加: `title` カラムにインデックス
-  - 理由: 検索パフォーマンス向上
-
-### 更新不要
-- auth-flow.context.md（認証フローに変更なし）
-\```
-
-### Step 4: Validation Gate (🚨 STOP)
-**ここで必ずユーザーの承認を待つ**
-
-更新計画を提示し、内容を確認してもらう:
-- [ ] API仕様の追記内容が正確か
-- [ ] データベーススキーマの変更が正確か
-- [ ] 不要な更新が含まれていないか
-
-- ✅ **承認された場合**: Step 5へ進む
-- ❌ **修正が必要な場合**: Step 2に戻る
-
-### Step 5: File Update
-承認後、コンテキストファイルを一括更新:
-
-- 各コンテキストファイルに変更内容を追記
-- 既存の情報と矛盾がないか確認
-- 更新日時を記録
-
-**完了報告:**
-
-\```markdown
-✅ コンテキストファイル更新完了
-
-### 更新されたファイル
-- [x] api-specification.context.md
-- [x] database-schema.context.md
-
-次の機能開発で、これらの情報が自動的に参照されます。
-\```
-````
-
-> 💡 **Tips**: このワークフローを `/review` の直後に実行することで、実装内容が確実にドキュメント化され、次の開発サイクルで AI が最新情報を参照できるようになります。
-
----
-
 ## 4. ワークフローの呼び出し方法
 
 ### 4.1 Copilot Chat から実行
@@ -446,9 +337,6 @@ Copilot Chat で `/` コマンドとして実行できます：
 
 /review
 実装内容をレビューしてください
-
-/update-context
-#file:[仕様書フォルダ]/priority-badge/priority-badge.plan.md
 ```
 
 ### 4.2 VS Code コマンドパレットから実行
