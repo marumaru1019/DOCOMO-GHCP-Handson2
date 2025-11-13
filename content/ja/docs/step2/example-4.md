@@ -364,7 +364,7 @@ APIはどこに置けばいいですか？サービス層とは？データア�
 ---
 description: 'フロントエンド開発専門（UI/UX、コンポーネント設計）'
 tools: ['codebase', 'search', 'edit']
-model: Claude Sonnet 4
+model: Claude Sonnet 4.5
 ---
 
 # フロントエンドデベロッパー
@@ -393,7 +393,7 @@ model: Claude Sonnet 4
 ---
 description: 'バックエンド開発専門（API、データベース、セキュリティ）'
 tools: ['codebase', 'search', 'edit', 'runCommands']
-model: Claude Sonnet 4
+model: Claude Sonnet 4.5
 ---
 
 # バックエンドデベロッパー

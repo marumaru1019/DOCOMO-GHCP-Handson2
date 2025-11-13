@@ -160,7 +160,7 @@ applyTo: "**/*.test.ts,**/*.spec.ts"
 | 項目 | 説明 | 例 |
 |------|------|-----|
 | `mode` | チャットモード | `"agent"`, `"ask"`, `"edit"` |
-| `model` | 使用するAIモデル | `"Claude Sonnet 4"` |
+| `model` | 使用するAIモデル | `"Claude Sonnet 4.5"` |
 | `description` | プロンプトの説明文 | `"TypeScriptリファクタリング"` |
 | `tools` | 使用可能なツール | `["editFiles", "problems"]` |
 
@@ -168,7 +168,7 @@ applyTo: "**/*.test.ts,**/*.spec.ts"
 ````markdown
 ---
 mode: agent
-model: Claude Sonnet 4
+model: Claude Sonnet 4.5
 description: "ファイルにヘッダーコメントを追加"
 tools: ["editFiles"]
 ---
@@ -230,14 +230,14 @@ tools: ["editFiles"]
 |------|------|-----|
 | `description` | モードの説明文 | `"実装計画を生成するモード"` |
 | `tools` | 使用可能なツール・ツールセット | `['codebase', 'search', 'usages']` |
-| `model` | 使用するAIモデル | `"Claude Sonnet 4"` |
+| `model` | 使用するAIモデル | `Claude Sonnet 4.5` |
 
 **例（コメント追加モード）:**
 ```markdown
 ---
 description: "コードに日本語コメントを追加"
 tools: ['codebase', 'editFiles']
-model: "Claude Sonnet 4"
+model: "Claude Sonnet 4.5"
 ---
 
 # コメント追加モード

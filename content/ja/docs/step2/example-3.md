@@ -142,7 +142,7 @@ description: "TypeScript 開発ガイドライン"
 ---
 description: 'バックエンド開発の専門家（API、データベース、セキュリティ）'
 tools: ['codebase', 'search', 'edit', 'runCommands', 'problems']
-model: Claude Sonnet 4
+model: Claude Sonnet 4.5
 ---
 
 # バックエンドエンジニア
