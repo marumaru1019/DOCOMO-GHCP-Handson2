@@ -1,428 +1,522 @@
 ---
-title: ② ツール
-categories: [GitHub Copilot, Agent Mode]
+title: "② 適切なプロンプト設計"
+categories: [GitHub Copilot, プロンプトエンジニアリング]
 weight: 2
+tags: [Markdown, コンテキストローディング, ロールアクティベーション, バリデーション]
 ---
 
-## 1. ツールとは？
+## 1. プロンプト設計とは？
 
-GitHub Copilot のチャットでは、**`#`ツール名**を使って便利な機能を呼び出すことができます。
-これらは「ツール」と呼ばれ、コードに関する情報を簡単に取得したり、様々な作業を自動化したりできます。
+プロンプト設計は、AI エージェントから一貫性のある高品質な応答を得るための技術です。単に「何をしてほしいか」を伝えるだけでなく、プロンプトを構造化することで、AI の応答をより予測可能で一貫性のあるものにできます。
 
-**身近な例で説明すると：**
-- `#selection` → 今選択しているコードについて質問
-- `#terminalSelection` → ターミナルのエラーメッセージについて質問
-- `#fetch` → ウェブサイトの内容を取得して分析
-
-> **ポイント**
->
-> * **チャット変数の参照** … `#-mention構文`で関連コンテキストを効率的に参照
-> * **Agent mode での自動実行** … 自律的なコーディングワークフローで必要に応じてツールが実行される
-> * **拡張機能とMCPサーバー** … 追加のツールを提供し、チャットプロンプトで利用可能
+ここでは、プロンプトを構造化する**1つの方法**として、5つの要素を組み合わせたアプローチを紹介します。すべての要素を常に含める必要はありませんが、タスクの複雑さや重要度に応じて適切な要素を選択することで、より効果的なプロンプトを設計できます。
 
 ---
 
-## 2. 利用可能なツール一覧
+## 2. 構造化プロンプトの設計例：5つの要素
 
-| ツール                          | 目的・説明                            |
-| ---------------------------- | -------------------------------- |
-| `#changes`                   | Git 変更一覧を取得し、差分を参照に会話            |
-| `#codebase`                  | ワークスペース全体をコード検索して関連箇所を抽出         |
-| `#editFiles`                 | ファイルの新規作成・編集を行うツールセット            |
-| `#extensions`                | VS Code 拡張機能を検索・質問               |
-| `#fetch`                     | 指定 URL の HTML/JSON などを取得して内容を利用  |
-| `#findTestFiles`             | テストファイルを検索して一覧化                  |
-| `#githubRepo`                | GitHub 上の公開リポジトリをコード検索           |
-| `#new`                       | 新しい VS Code ワークスペースをスキャフォールド     |
-| `#openSimpleBrowser`         | VS Code 内ブラウザでローカル Web アプリをプレビュー |
-| `#problems`                  | Problems パネルのエラー・警告を取得           |
-| `#readCellOutput`            | Notebook のセル出力を読み取り              |
-| `#runCommands`               | ターミナルコマンドを実行し出力を取得               |
-| `#runNotebooks`              | Notebook のセルを実行し出力を取得            |
-| `#runTasks`                  | `tasks.json` に定義したタスクを実行         |
-| `#runTests`                  | テストスイートを実行し結果を取得                 |
-| `#search` / `#searchResults` | ワークスペース内のファイル検索＆結果取得             |
-| `#selection`                 | エディタで選択中のテキストをコンテキスト追加           |
-| `#terminalSelection`         | ターミナルで選択中のテキスト（コマンドなど）を追加        |
-| `#terminalLastCommand`       | 直近で実行したターミナルコマンドを追加              |
-| `#testFailure`               | テスト失敗情報をコンテキストに追加                |
-| `#usages`                    | シンボル参照・実装・定義情報をまとめて取得            |
-| `#VSCodeAPI`                 | VS Code 拡張 API のリファレンスを検索        |
+プロンプトを構造化する1つのアプローチとして、以下の5つの要素を組み合わせる方法があります。タスクに応じて必要な要素を選択して使用してください。
+
+```mermaid
+flowchart TD
+    A["1. ロールアクティベーション<br/>（専門家の役割を定義）"] --> B["2. コンテキストローディング<br/>（必要な情報を注入）"]
+    B --> C["3. 構造化された思考<br/>（明確な手順を提示）"]
+    C --> D["4. ツール統合<br/>（使用するツールを指定）"]
+    D --> E["5. バリデーションゲート<br/>（承認ポイントを設定）"]
+    
+    style A fill:#e1f5fe
+    style B fill:#fff9c4
+    style C fill:#f3e5f5
+    style D fill:#c8e6c9
+    style E fill:#ffebee
+```
+
+### 2.1 要素別の効果
+
+| 要素 | 目的 | 効果 |
+|------|------|------|
+| **ロールアクティベーション** | 特定の知識ドメインを活性化 | 専門的で焦点を絞った応答 |
+| **コンテキストローディング** | 関連情報を AI に提供 | 正確で文脈に沿った提案 |
+| **構造化された思考** | 明確な推論経路を提供 | 予測可能で論理的なプロセス |
+| **ツール統合** | 制御可能な方法でツール実行 | 再現可能な結果 |
+| **バリデーションゲート** | 人間の監督を確保 | 誤った変更の防止 |
 
 ---
 
-## 3. 具体的なツールの使い方
+## 3. 各要素の具体例と使い方
 
-### :pen: 例題
+それぞれの要素がどのようにプロンプトを改善するか、具体例を見ていきましょう。必要に応じて1つまたは複数の要素を組み合わせて使用します。
 
-よく使うツールの実際の使い方を見てみましょう。
+### 3.1 ロールアクティベーション
 
-### 💡 シナリオ1：ターミナルでエラーが出た時
+#### :pen: 例題 - 専門家の役割を定義する
 
-**状況：** ターミナルでコマンドを実行したらエラーメッセージが表示された
+AI に特定の役割を割り当てることで、その分野の専門知識を活性化できます。
 
-**やり方：**
-1. ターミナルのエラーメッセージをマウスで選択
-2. チャットに以下のように入力
+**基本的なプロンプト（改善前）:**
 
 ```text
-#terminalSelection このエラーを解決する方法を教えて
+コードをレビューして
 ```
 
-**結果：** Copilotがエラーの原因と解決方法を詳しく説明してくれます
+**ロールアクティベーションを追加（改善後）:**
+
+```text
+あなたはシニアフロントエンド開発者で、React と TypeScript のベストプラクティスに精通しています。パフォーマンス最適化とアクセシビリティを特に重視してコードレビューを行ってください。
+
+以下のコンポーネントをレビューしてください...
+```
+
+#### :robot: 効果の比較
+
+| 指標 | 基本的なプロンプト | ロールアクティベーション付き |
+|------|-------------------|--------------------------|
+| **専門性** | 一般的なアドバイス | React/TS 特化の提案 |
+| **フォーカス** | 広範囲 | パフォーマンスとA11y重視 |
+| **一貫性** | 低い（毎回異なる視点） | 高い（常に同じ専門視点） |
+
+> 💡 **Tips**: 役割には具体的なスキルセットや重視する観点を含めることで、より一貫性のある応答が得られます。
 
 ---
 
-### 💡 シナリオ2：React公式サイトの情報が知りたい時
+### 3.2 コンテキストローディング
 
-**状況：** Reactの最新情報をチェックしたい
+#### :pen: 例題 - リンクによる情報注入
 
-**やり方：**
-```text
-#fetch https://react.dev Reactの最新バージョンについて教えて
-```
+Markdown のリンク記法は、AI にとって「コンテキスト注入ポイント」として機能します。
 
-**結果：** React公式サイトから最新バージョンの情報を取得し、要約してくれます
-
-### 💡 シナリオ3：Next.jsのスタイリングライブラリを調べたい時
-
-**状況：** Next.jsで使えるスタイリングライブラリの選択肢を知りたい
-
-**やり方：**
-```text
-#githubRepo nextjsで使用できるスタイリング用のライブラリで使えそうなものをいくつか教えて
-```
-
-**結果：** Next.jsエコシステムから人気のスタイリングライブラリ（Tailwind CSS、Styled Components、Chakra UI等）とその特徴を教えてくれます
-
-## 4. 分からない時は直接聞こう
-
-**使い方が分からないツールがある時は、直接聞いてみましょう**
+**コンテキストなしのプロンプト:**
 
 ```text
-#terminalSelection このツールの使い方を教えて
+新しい API エンドポイントを実装してください
 ```
 
-どのツールでも「このツールの使い方を教えて」と聞けば、詳しい説明をしてくれます。
+**コンテキストローディングを追加:**
+
+```text
+[既存の API パターン](./src/api/patterns.ts)と[認証ガイドライン](./docs/auth.md)を参照して、ユーザー情報取得の新しい API エンドポイントを実装してください。
+
+エンドポイント仕様:
+- パス: `/api/users/:id`
+- メソッド: GET
+- 認証: JWT トークン必須
+```
+
+#### :robot: コンテキストローディングのパターン
+
+```markdown
+## 効果的なコンテキストローディングの書き方
+
+### パターン1: ファイルへのリンク
+[プロジェクト構造](./docs/architecture.md)を確認してください
+
+### パターン2: 複数のリファレンス
+[型定義](./types/index.ts)と[API 仕様](./docs/api-spec.md)に従ってください
+
+### パターン3: 外部リソース
+[REST API ベストプラクティス](https://restfulapi.net/)を参考にしてください
+
+### パターン4: 既存のコード
+[既存の実装](./src/components/UserProfile.tsx)と同じパターンで実装してください
+```
+
+> ⚠️ **注意**: リンクは AI が自動的に読み込むため、本当に必要な情報だけをリンクしてください。無関係な情報はコンテキストウィンドウを圧迫します。
 
 ---
 
-## 5. Agent mode でのツール制御
+### 3.3 構造化された思考
 
-Agent mode では、使用するツールを制御できます。
+#### :pen: 例題 - 明確な手順の提示
 
+見出しと箇条書きを使って、AI の思考プロセスをステップバイステップでガイドします。
 
-**Tool Pickerの使い方：**
-![ツールの選択方法](../images/tool_select.png)
-1. Agent mode のチャット入力欄右端の 🔧 アイコンをクリック
-2. 使いたいツールだけにチェックを入れる
+**非構造化プロンプト:**
 
-これにより、Agent mode が自動で作業する際に使用するツールを制限できます。
+```text
+バグを修正して、テストを追加して、ドキュメントを更新してください
+```
+
+**構造化されたプロンプト:**
+
+```text
+# バグ修正とテスト追加タスク
+
+## フェーズ1: 問題の特定
+1. [エラーログ](./logs/error.log)を分析する
+2. 根本原因を特定する
+3. 影響範囲を調査する
+
+## フェーズ2: 修正の実装
+1. 最小限の変更で修正を実装する
+2. 既存のテストが通ることを確認する
+
+## フェーズ3: テストの追加
+1. バグを再現するテストケースを作成する
+2. エッジケースもカバーする
+
+## フェーズ4: ドキュメント更新
+1. 変更内容を CHANGELOG.md に記載する
+2. 関連する API ドキュメントを更新する
+
+各フェーズ完了後、次に進む前に結果を報告してください。
+```
+
+#### :robot: 構造化のベストプラクティス
+
+```markdown
+## 効果的な構造化の要素
+
+### ✅ 使うべき構造
+- **見出し階層** で大きなステップを分ける
+- **番号付きリスト** で順序を明確にする
+- **チェックボックス** で完了条件を示す
+- **コードブロック** で期待する形式を示す
+
+### ❌ 避けるべき構造
+- 長い段落での説明（AI が迷いやすい）
+- 曖昧な表現（「適切に」「良い感じに」など）
+- 複数の解釈が可能な指示
+- 暗黙的な前提条件
+```
 
 ---
 
-## 6. MCPサーバーでツールを拡張する
+### 3.4 ツール統合
 
-### 6.1 MCP とは
+#### :pen: 例題 - MCP ツールの明示的な指定
 
-MCP（Model Context Protocol）は、**AIと外部システム（API/DB/ファイル/クラウド等）を安全に接続するための標準プロトコル**です。VS Code の Copilot Chat に MCP サーバーを追加すると、そのサーバーが提供する"ツール"が **Tool Picker** に現れ、Agent mode から呼び出せます。
+使用するツールを明示的に指定することで、再現可能で制御された実行が可能になります。
 
-### 6.2 導入メリット
-
-* **手作業のコマンド/API呼び出しを会話化**（例：GitHubやAzure操作）
-* **再利用・持ち運びが効く**：MCPはクライアント非依存（VS Code/JetBrains/Visual Studio 等）で同じサーバーを使い回せる
-* **構成の見える化**：`mcp.json` で「どのツールを使って良いか」を明文化し、リポジトリに同梱可能
-
-### 6.3 ソース
-[公式サンプル集](https://github.com/modelcontextprotocol/servers/tree/main) に、どんな MCP サーバーが使えるのかの一覧が記載しているので御覧ください。
-
-### :pen: 例題：Azure MCP ServerでBicepテンプレート作成
-
-**目的：** Storage AccountのBicepテンプレートを最新のAPI仕様で作成したい
-
-**手順：**
-
-1. [拡張機能のリンク](vscode:extension/ms-azuretools.vscode-azure-mcp-server) を開いてインストール
-   ![Azure MCP Server 拡張機能](../images/azuremcp.png)
-
-2. **Copilot Chat → Agent** を選択し、🔧 **Tools** で "Azure MCP Server" のツールを有効化
-   ![Azure MCP Server 有効化](../images/azuremcpactivate.png)
-
-3. チャットに以下のプロンプトを入力：
+**ツール指定なしのプロンプト:**
 
 ```text
-#bicepschema
-最新のapiVersionでStorage AccountのBicepテンプレートを作成してください。
-
-要件：
-- SKU: Standard_LRS
-- 既存VNet統合は不要
-- 冪等性を保つ設計
-- 説明コメントも含める
-
+Azure のログを確認してエラーの原因を調べてください
 ```
 
-### :robot: 出力例
+**ツール統合を含むプロンプト:**
 
-Azure MCP Serverが最新のAPI仕様を取得し、以下のようなBicepテンプレートを生成：
-
-```bicep
-// ============================================================================
-// Storage Account Bicep Template
-// ============================================================================
-// このテンプレートは、Azure Storage Accountを作成します。
-// 最新のAPI Version: 2025-01-01を使用しています。
-//
-// 主な機能:
-// - Standard_LRS SKUによるローカル冗長ストレージ
-// - HTTPS通信の強制
-// - TLS 1.2以上の要求
-// - 階層型名前空間(HNS)の有効化オプション
-// - パブリックアクセスの制御
-// - 冪等性の保証（既存リソースがあっても安全にデプロイ可能）
-// ============================================================================
-
-// ----------------------------------------------------------------------------
-// パラメータ定義
-// ----------------------------------------------------------------------------
-
-@description('Storage Accountの名前（グローバルに一意である必要があります）')
-@minLength(3)
-@maxLength(24)
-param storageAccountName string
-
-@description('Storage Accountをデプロイするリージョン')
-param location string = resourceGroup().location
-
-@description('Storage AccountのSKU（Standard_LRS: ローカル冗長ストレージ）')
-@allowed([
-  'Standard_LRS'
-  'Standard_GRS'
-  'Standard_RAGRS'
-  'Standard_ZRS'
-  'Premium_LRS'
-  'Premium_ZRS'
-  'Standard_GZRS'
-  'Standard_RAGZRS'
-])
-param skuName string = 'Standard_LRS'
-
-@description('Storage Accountの種類')
-@allowed([
-  'Storage'
-  'StorageV2'
-  'BlobStorage'
-  'FileStorage'
-  'BlockBlobStorage'
-])
-param kind string = 'StorageV2'
-
-@description('アクセス層（Hot: 頻繁なアクセス、Cool: 低頻度アクセス）')
-@allowed([
-  'Hot'
-  'Cool'
-])
-param accessTier string = 'Hot'
-
-@description('階層型名前空間の有効化（Data Lake Storage Gen2機能）')
-param enableHierarchicalNamespace bool = false
-
-@description('パブリックネットワークアクセスの許可設定')
-@allowed([
-  'Enabled'
-  'Disabled'
-])
-param publicNetworkAccess string = 'Enabled'
-
-@description('Blob のパブリックアクセスを許可するかどうか')
-param allowBlobPublicAccess bool = false
-
-@description('共有キーアクセスを許可するかどうか（false推奨：Managed Identity使用）')
-param allowSharedKeyAccess bool = true
-
-@description('最小TLSバージョン')
-@allowed([
-  'TLS1_0'
-  'TLS1_1'
-  'TLS1_2'
-  'TLS1_3'
-])
-param minimumTlsVersion string = 'TLS1_2'
-
-@description('HTTPSトラフィックのみを許可するかどうか')
-param supportsHttpsTrafficOnly bool = true
-
-@description('リソースタグ')
-param tags object = {
-  Environment: 'Production'
-  ManagedBy: 'Bicep'
-  CreatedDate: '2025-10-01'
-}
-
-// ----------------------------------------------------------------------------
-// 変数定義
-// ----------------------------------------------------------------------------
-
-// ネットワークルールのデフォルト設定
-var networkAcls = {
-  bypass: 'AzureServices'
-  defaultAction: publicNetworkAccess == 'Disabled' ? 'Deny' : 'Allow'
-  ipRules: []
-  virtualNetworkRules: []
-}
-
-// ----------------------------------------------------------------------------
-// リソース定義
-// ----------------------------------------------------------------------------
-
-@description('Azure Storage Account')
-resource storageAccount 'Microsoft.Storage/storageAccounts@2025-01-01' = {
-  name: storageAccountName
-  location: location
-  tags: tags
-
-  // SKU設定（冗長性レベル）
-  sku: {
-    name: skuName
-  }
-
-  // Storage Accountの種類
-  kind: kind
-
-  // プロパティ設定
-  properties: {
-    // アクセス層の設定（BlobStorageまたはStorageV2の場合に有効）
-    accessTier: accessTier
-
-    // HTTPSトラフィックのみを許可
-    supportsHttpsTrafficOnly: supportsHttpsTrafficOnly
-
-    // 最小TLSバージョンの設定
-    minimumTlsVersion: minimumTlsVersion
-
-    // 階層型名前空間の有効化（Data Lake Storage Gen2）
-    isHnsEnabled: enableHierarchicalNamespace
-
-    // パブリックネットワークアクセスの制御
-    publicNetworkAccess: publicNetworkAccess
-
-    // Blobのパブリックアクセス制御
-    allowBlobPublicAccess: allowBlobPublicAccess
-
-    // 共有キーアクセスの制御（Managed Identity推奨）
-    allowSharedKeyAccess: allowSharedKeyAccess
-
-    // クロステナントレプリケーションの制御（セキュリティ強化）
-    allowCrossTenantReplication: false
-
-    // デフォルト認証をOAuthに設定（セキュリティ強化）
-    defaultToOAuthAuthentication: true
-
-    // ネットワークACLの設定
-    networkAcls: networkAcls
-
-    // 暗号化設定（デフォルトでMicrosoft管理キーを使用）
-    encryption: {
-      services: {
-        blob: {
-          enabled: true
-          keyType: 'Account'
-        }
-        file: {
-          enabled: true
-          keyType: 'Account'
-        }
-        table: {
-          enabled: true
-          keyType: 'Account'
-        }
-        queue: {
-          enabled: true
-          keyType: 'Account'
-        }
-      }
-      keySource: 'Microsoft.Storage'
-      requireInfrastructureEncryption: false
-    }
-  }
-}
-
-// ----------------------------------------------------------------------------
-// 出力
-// ----------------------------------------------------------------------------
-
-@description('作成されたStorage AccountのリソースID')
-output storageAccountId string = storageAccount.id
-
-@description('作成されたStorage Accountの名前')
-output storageAccountName string = storageAccount.name
-
-@description('Blob Serviceのプライマリエンドポイント')
-output blobEndpoint string = storageAccount.properties.primaryEndpoints.blob
-
-@description('File Serviceのプライマリエンドポイント')
-output fileEndpoint string = storageAccount.properties.primaryEndpoints.file
-
-@description('Queue Serviceのプライマリエンドポイント')
-output queueEndpoint string = storageAccount.properties.primaryEndpoints.queue
-
-@description('Table Serviceのプライマリエンドポイント')
-output tableEndpoint string = storageAccount.properties.primaryEndpoints.table
-
-@description('Storage Accountのプライマリロケーション')
-output primaryLocation string = storageAccount.properties.primaryLocation
-
-```
-
-**操作：**
-1. 提案されたBicepテンプレートを確認
-2. 必要に応じて「セキュリティをより強化して」等の追加指示
-3. Agent modeが自動的に `#editFiles` ツールでファイル作成
-
-### 💡 その他の活用例
-
-**APIバージョン確認：**
 ```text
-#bicepschema
-Microsoft.KeyVault/vaults の最新 apiVersion を教えて
+あなたは Azure インフラストラクチャの専門家です。
+
+## 調査手順
+
+1. **ローカルログの確認**
+   [エラーログ](./logs/error.log)で初期症状を確認する
+
+2. **Azure ログの取得**
+   `azmcp-monitor-log-query` MCP ツールを使用して、過去1時間の Application Insights ログを取得する
+   
+   クエリパラメータ:
+   - timeRange: "PT1H"
+   - query: "traces | where severityLevel >= 3"
+
+3. **相関分析**
+   ローカルログと Azure ログのタイムスタンプを照合し、根本原因を特定する
+
+4. **報告**
+   発見した問題と推奨される解決策をまとめる
 ```
 
-**スキーマ情報取得：**
+#### :robot: ツール統合のパターン
+
+| シナリオ | 使用するツール | プロンプト例 |
+|---------|---------------|-------------|
+| **コードベース検索** | `#codebase` | `#codebase で認証関連のコードを検索してください` |
+| **Web情報取得** | `#fetch` | `#fetch で https://example.com の内容を取得してください` |
+| **ファイル検索** | `file-search` | `file-search ツールで **/*.test.ts パターンのファイルを探してください` |
+| **ターミナル実行** | `runCommands` | `runCommands ツールで npm test を実行してください` |
+
+> 💡 **Tips**: VS Code の GitHub Copilot は、チャットモードの `tools` フィールドで利用可能なツールを制限できます。これにより、意図しないツールの使用を防げます。
+
+---
+
+### 3.5 バリデーションゲート
+
+#### :pen: 例題 - 承認ポイントの設定
+
+重要な意思決定ポイントで人間の承認を求めることで、誤った変更を防ぎます。
+
+**バリデーションゲートなしのプロンプト:**
+
 ```text
-#bicepschema
-Microsoft.KeyVault/vaults のスキーマ情報を教えて
+データベーススキーマを変更してマイグレーションを実行してください
 ```
 
-> **補足：** Azure MCP Serverには Azure CLI 実行ツールも含まれており、既存リソースの状態確認や前提調査も会話で実行できます。
+**バリデーションゲート付きプロンプト:**
+
+```text
+# データベーススキーマ変更タスク
+
+## フェーズ1: 現状分析
+1. [現在のスキーマ](./prisma/schema.prisma)を確認する
+2. 変更による影響範囲を特定する
+3. 既存データとの互換性を確認する
+
+## ⚠️ バリデーションゲート #1
+**ここで停止してください**
+
+以下を報告し、ユーザーの承認を得てから続行してください：
+- 変更内容の詳細
+- 影響を受けるテーブルとカラム
+- データ移行が必要かどうか
+- ロールバック戦略
+
+## フェーズ2: マイグレーション作成（承認後のみ）
+1. マイグレーションファイルを生成する
+2. マイグレーションの内容をレビュー用に表示する
+
+## ⚠️ バリデーションゲート #2
+**ここで停止してください**
+
+マイグレーションの内容を確認し、承認を得てから実行してください。
+
+## フェーズ3: 実行（承認後のみ）
+1. バックアップの確認を促す
+2. マイグレーションを実行する
+3. 結果を報告する
+```
+
+---
+
+## 4. 実践例：5つの要素を組み合わせた構造化プロンプト
+
+### :pen: 例題 - タスク管理CLIツールの作成
+
+タスクの複雑さに応じて、5つの要素を組み合わせた高度に構造化されたプロンプトを設計できます。以下は、複雑なタスクに対して全要素を活用した例です。この例は、他のファイルなしで完全に試せる自己完結型の内容です。
+
+#### ステップ1: まず、コンテキスト用のドキュメントを作成
+
+実際に Copilot に以下のプロンプトを渡して、参照用ドキュメントを作成します：
+
+```text
+以下の内容で coding_standards.md というドキュメントを作成してください：
+
+# コーディング規約
+
+## Python スタイルガイド
+- PEP 8 に準拠する
+- 関数には必ず docstring を記載する
+- 型ヒントを使用する（Python 3.9+）
+
+## エラーハンドリング
+- 予期されるエラーは適切に catch する
+- エラーメッセージはユーザーフレンドリーに
+- ログ出力には logging モジュールを使用
+
+## CLI 設計
+- argparse を使用してコマンドライン引数を処理
+- --help オプションで使い方を表示
+- サブコマンド形式を採用（add, list, done など）
+```
+
+#### ステップ2: コンテキストを参照する完全なプロンプト
+
+ドキュメントを作成したら、以下のプロンプトを使用します：
+
+**改善前（基本的なプロンプト）:**
+```text
+Todoを管理するPythonスクリプトを書いて
+```
+
+**改善後（5つの要素を組み合わせたプロンプト）:**
+````markdown
+以下の内容で タスク管理CLIツールを実装してください：
+
+# シンプルなタスク管理CLIツールの実装
+
+## ロール定義
+あなたは Python CLI アプリケーション開発の専門家です。
+ユーザビリティとコードの保守性を重視し、
+業界標準のベストプラクティスに従った実装を行います。
+
+## コンテキストローディング
+[コーディング規約](./coding_standards.md)に従って実装してください。
+特に以下の点を重視してください：
+- 型ヒントの使用
+- 適切な docstring
+- argparse によるCLI設計
+
+## 実装手順
+
+### ステップ1: 基本構造の作成
+1. タスクを保存する JSON ファイル (tasks.json) を管理する
+2. タスクの構造を定義する（id, title, done, created_at）
+3. ファイル読み書きの基本関数を実装する
+
+### ステップ2: CLI コマンドの実装
+以下のサブコマンドを実装してください：
+1. `add <タスク名>` - 新しいタスクを追加
+2. `list` - すべてのタスクを一覧表示
+3. `done <タスクID>` - タスクを完了にする
+4. `delete <タスクID>` - タスクを削除
+
+**🚨 バリデーションゲート**
+ここで一度停止してください。
+基本機能の実装方針とデータ構造を提示し、確認を求めてください。
+追加したい機能（priority、due_date など）があれば教えてください。
+
+### ステップ3: 機能拡張（承認後）
+1. タスクの表示を見やすくフォーマット（完了/未完了の区別など）
+2. エラーハンドリングを追加（存在しないID、ファイル破損など）
+3. --help オプションで使い方を表示
+
+## 実装要件
+- [ ] Python 3.9 以上で動作
+- [ ] 型ヒント付きの関数定義
+- [ ] 各関数に docstring
+- [ ] argparse によるCLI実装
+- [ ] JSON ファイルでデータ永続化
+- [ ] エラーハンドリング
+- [ ] 使用例を含む README
+
+## 期待する出力
+- todo.py（メインスクリプト）
+- tasks.json（データファイル、初回実行時に自動生成）
+- README.md（使い方の説明）
+
+## 実行例
+```
+python todo.py add "プロンプト設計の資料を読む"
+python todo.py list
+python todo.py done 1
+```
+````
+
+### :robot: 5つの要素がどのように機能するか
+
+```markdown
+【① ロールアクティベーション】
+「Python CLI アプリケーション開発の専門家」
+→ argparse の使用、標準的なCLI設計パターン
+
+【② コンテキストローディング】
+[コーディング規約](./coding_standards.md) を参照
+→ 型ヒント、docstring、エラーハンドリングが自動適用
+
+【③ 構造化された思考】
+ステップ1→2→3の明確な実装順序
+→ データ層→コマンド実装→拡張機能の段階的開発
+
+【④ ツール統合】
+argparse, JSON, typing の明示的な指定
+→ 適切なライブラリ選択と一貫した実装
+
+【⑤ バリデーションゲート】
+基本機能実装後に承認を求める
+→ 機能拡張前にデータ構造と方針を確認可能
+```
+
+### :robot: 実際に試してみよう
+
+**手順:**
+
+1. **新しいフォルダを作成**
+   ```bash
+   mkdir todo-cli-demo
+   cd todo-cli-demo
+   ```
+
+2. **VS Code で Copilot Chat を開く**
+   - まず「ステップ1のプロンプト」で `coding_standards.md` を作成
+   - 次に「ステップ2のプロンプト」でメインスクリプトを作成
+
+3. **生成されたコードの例**
+
+```python
+# todo.py
+"""
+シンプルなタスク管理CLIツール
+
+Usage:
+    python todo.py add "タスク名"
+    python todo.py list
+    python todo.py done <id>
+    python todo.py delete <id>
+"""
+
+import argparse
+import json
+from datetime import datetime
+from pathlib import Path
+from typing import List, Dict, Optional
+
+TASKS_FILE = Path("tasks.json")
+
+def load_tasks() -> List[Dict]:
+    """タスク一覧をJSONファイルから読み込む
+    
+    Returns:
+        List[Dict]: タスクのリスト
+    """
+    if not TASKS_FILE.exists():
+        return []
+    
+    try:
+        with open(TASKS_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except json.JSONDecodeError:
+        print("⚠️  タスクファイルが破損しています。新しいファイルを作成します。")
+        return []
+
+def save_tasks(tasks: List[Dict]) -> None:
+    """タスク一覧をJSONファイルに保存する
+    
+    Args:
+        tasks: 保存するタスクのリスト
+    """
+    with open(TASKS_FILE, "w", encoding="utf-8") as f:
+        json.dump(tasks, f, ensure_ascii=False, indent=2)
+
+# ... 以下、add_task, list_tasks, done_task などの実装
+```
+
+4. **動作確認**
+   ```bash
+   python todo.py add "GitHub Copilot を使ってみる"
+   python todo.py list
+   ```
+
+> 💡 **実践のコツ**: 
+> - バリデーションゲートで停止させ、「priority フィールドを追加したい」などの追加要求を出してみてください
+> - `coding_standards.md` の内容を変更して、コーディングスタイルがどう変わるか試してみてください
+> - コンテキストファイルがある場合とない場合で、生成されるコードの品質を比較してみてください
 
 ---
 
 ## :memo: 練習
 
-以下の練習で実際にツールを使ってみましょう：
+以下の練習でプロンプトの構造化手法を習得しましょう：
 
-1. **エラー解析の練習**
-   何かコマンドを実行してエラーを出し、`#terminalSelection`で解決方法を聞いてみる
+1. **構造化要素の段階的適用**
+   - 自分がよく使うプロンプトを1つ選んでください
+   - 5つの要素（ロール・コンテキスト・構造・ツール・バリデーション）の中から、タスクに適した要素を1〜2つ選んで追加してください
+   - 構造化前と構造化後で結果を比較してください
+   - さらに別の要素を追加すると、どのような改善が見られるか試してください
 
-2. **情報収集の練習**
-   `#fetch`で好きなウェブサイトの情報を取得・要約してもらう
+2. **コンテキストローディングの実践**
+   - 自分のプロジェクトで、AI に参照してほしいドキュメントやコードファイルを3つ選んでください
+   - それらを Markdown リンク形式でプロンプトに含めてください
+   - リンクありとなしで AI の応答の精度を比較してください
 
-3. **コード研究の練習**
-   `#githubRepo`で興味のあるプロジェクトのコードを検索してもらう
+3. **バリデーションゲートの設計**
+   - データベース変更やデプロイなど、リスクの高いタスクを1つ選んでください
+   - 適切な承認ポイントを特定してください
+   - 各承認ポイントで確認すべき内容をリスト化してください
+   - そのタスク用の完全なプロンプトを作成してください
 
-4. **MCP拡張の練習（上級者向け）**
-   - `.vscode/mcp.json` を作成してシンプルなMCPサーバーを追加してみる
-   - Tool Pickerで新しいツールが表示されることを確認する
+> プロンプト設計は「アート」ではなく「エンジニアリング」です。これらの要素を体系的に適用することで、誰でも高品質なプロンプトを作成できます。最初は時間がかかりますが、パターンを学ぶことで効率的になります。
 
 ---
 
-## 7. まとめ
+## まとめ
 
-* **`#`記号** でツールを簡単に呼び出せる
-* **シナリオ別** に使い分けることで効率的な開発が可能
-* **分からない時は直接聞く** ことで新しいツールも覚えやすい
-* **Agent mode** では自動でツールが選択されるが、Tool Pickerで制御も可能
-* **MCPサーバー** で外部システム連携ツールを追加可能（Azure、GitHub等）
-* **実際に使ってみる** ことで、各ツールの便利さが実感できる
+* **プロンプトの構造化** により、AI からの応答が予測可能で一貫性のあるものに
+* **5つの要素** は構造化の1つのアプローチ。タスクに応じて必要な要素を選択
+* **ロールアクティベーション** で専門知識ドメインを活性化し、フォーカスした応答を獲得
+* **コンテキストローディング** により、関連情報を効率的に AI に提供
+* **構造化された思考** で明確な推論経路を提供し、AI の思考プロセスをガイド
+* **ツール統合** により、再現可能で制御された方法でツールを実行
+* **バリデーションゲート** で重要な意思決定ポイントに人間の監督を確保
+* 単純なタスクには1〜2要素、複雑なタスクには複数要素を組み合わせるのが効果的
 
-> MCPサーバーを活用することで、GitHub Copilotの基本ツールを大幅に拡張し、プロジェクト固有のワークフローに最適化された開発環境を構築できます。
+次のセクションでは、これらのプロンプト設計の知識を「再利用可能なコンポーネント」として体系化する方法を学びます。

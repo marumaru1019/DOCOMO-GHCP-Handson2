@@ -1,6 +1,148 @@
-コンテンツは下記の汎用テンプレートに沿って書いて。
+# GitHub Copilot ハンズオン資料プロジェクト
 
-# 共通の構成パターン（骨子）
+このプロジェクトは、Hugo + Docsy テーマを使用した GitHub Copilot の学習コンテンツサイトです。
+
+## プロジェクト構造
+
+```
+content/ja/docs/          # 日本語ドキュメントのメインコンテンツ
+├── overview/            # ハンズオンの概要・セットアップ
+├── step1/               # 基本操作（補完、チャット、ツール）
+├── step2/               # エージェントモードとカスタマイズ
+├── step3/               # 実践的な開発フロー演習
+├── step4/               # 課題演習
+├── step15/              # GitHub Copilot の基礎
+└── step16/              # AI 開発ワークフロー構築
+
+.github/
+├── copilot-instructions.md   # このファイル（プロジェクト全体のガイド）
+├── memory/
+│   └── content.memory.md     # 作成済みコンテンツの記録
+└── prompts/
+    └── create-content-memory.prompt.md  # コンテンツ記録更新用プロンプト
+
+layouts/                 # Hugo テンプレートのカスタマイズ
+assets/scss/            # カスタムスタイル
+```
+
+## コンテンツ作成ガイドライン
+
+### 必須の構成パターン
+
+各ドキュメント（`example-X.md`）は以下の5セクション構造に従う：
+
+1. **導入セクション** - 「〇〇とは？」で機能概要と学習目標を1-2段落で説明
+2. **基本概念セクション** - 技術的背景、動作原理をテーブルや図解で説明
+3. **具体的な使い方** - `:pen: 例題` → `:robot: 出力例` のペアで実践シナリオを提示
+4. **練習セクション** - `:memo: 練習` で3つ程度の実践課題を提供
+5. **まとめ** - 重要ポイントと使い分け指針を3-5個の箇条書きで要約
+
+### Front Matter の規則
+
+```yaml
+---
+title: "① [トピック名]"           # 丸数字（①②③）+ トピック名
+categories: [メインカテゴリ, サブカテゴリ]
+weight: [表示順序]                 # 小さい数字ほど前に表示
+tags: [関連タグ]                   # オプション
+---
+```
+
+### アイコン記法の統一
+
+- `:pen:` - 例題の導入（プロンプト例）
+- `:robot:` - Copilot の応答・出力例
+- `:memo:` - 練習課題セクション
+- `💡` - Tips・補足情報（`> 💡 **Tips**: 内容`）
+- `⚠️` - 重要な注意事項（`> ⚠️ **注意**: 内容`）
+
+### コードブロックの言語指定
+
+- プロンプト例: ````text`（または ````markdown`）
+- コード例: 適切な言語名（`typescript`, `python`, `bash` など）
+- Markdown のネスト: 5つのバッククォート（`````markdown`）
+
+### 画像の配置
+
+- パス: `../images/filename.png`（kebab-case 命名）
+- 各 step フォルダに `images/` ディレクトリを配置
+- 操作手順と紐づけて説明文を記載
+
+## 重要な開発ルール
+
+### コンテンツ作成前の確認
+
+1. **`.github/memory/content.memory.md` を確認** - 重複コンテンツを避けるため
+2. **`guideline.md` の構造テンプレートに従う** - 一貫性維持のため
+3. **既存の step2, step3 を参考にする** - スタイルとトーンを合わせる
+
+### コンテンツ作成後のタスク
+
+作業完了後は `.github/prompts/create-content-memory.prompt.md` を実行して `content.memory.md` を更新すること。
+
+## ビルドとデプロイ
+
+### ローカル開発
+
+```bash
+npm install          # Hugo のインストール（初回のみ）
+npm run serve        # http://localhost:1313 で確認
+```
+
+### Azure Static Web Apps へのデプロイ
+
+```bash
+npm install -g @azure/static-web-apps-cli
+swa login --no-use-keychain
+swa init
+swa deploy --env production --app-location ./ --deployment-token <トークン>
+```
+
+## Hugo/Docsy の技術詳細
+
+- **Hugo バージョン**: 0.110.0 以上（extended 版）
+- **テーマ**: Docsy（Hugo module として導入）
+- **言語設定**: 日本語のみ（`contentDir = "content/ja"`）
+- **ページ順序**: Front Matter の `weight` で制御（小さい値が前）
+- **タクソノミー**: `categories` と `tags` を使用
+
+## よくある作業パターン
+
+### 新しい step セクションの追加
+
+1. `content/ja/docs/stepX/` フォルダを作成
+2. `_index.md` でセクション概要を記載
+3. `example-1.md`, `example-2.md`... を順次作成
+4. `images/` フォルダにスクリーンショットを配置
+5. `content.memory.md` を更新
+
+### 既存コンテンツの修正
+
+1. 該当する `example-X.md` を編集
+2. 5セクション構造を崩さないよう注意
+3. アイコン記法とコードブロック言語指定を確認
+4. 必要に応じて `content.memory.md` を更新
+
+### プロンプトの動作確認
+
+コンテンツ内のプロンプト例は必ず GitHub Copilot で実際に動作確認すること。学習者が同じ結果を得られることが重要。
+
+## コンテンツの階層と学習フロー
+
+- **step1**: GitHub Copilot の基本操作（補完、チャット、ツール）
+- **step2**: エージェントモード、ツールセット、カスタマイズ
+- **step3**: 実践的な開発フロー（プロジェクト理解→設計→実装→テスト）
+- **step4**: 独自の課題演習（検索機能、ダークモード実装など）
+- **step15**: GitHub Copilot の基礎知識の再確認
+- **step16**: AI 開発ワークフロー構築の高度なトピック
+
+各 step は独立して学習可能だが、step1 → step2 → step3 の順が推奨される学習パス。
+
+---
+
+# 以下は既存のコンテンツ作成テンプレート（詳細版）
+
+## 共通の構成パターン（骨子）
 
 1. **メタ情報（Front matter）**
    　`title / categories / weight` でナビゲーション順と対象読者を定義。

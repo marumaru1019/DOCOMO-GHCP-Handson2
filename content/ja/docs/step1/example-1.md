@@ -1,202 +1,380 @@
 ---
-title: ① コード補完
-categories: [技術者向け, GitHub Copilot 基本]
-tags: [json, csv, Format]
+title: ① チャット
+categories: [GitHub Copilot, 基礎]
 weight: 1
 ---
 
-GitHub Copilot の最も基本的な使用法のひとつが**コード補完**です。途中まで書いたコードに対して候補を提案してくれるため、最小限のタイプで実装が可能になります。ここでは **JavaScript** を使ったサンプルを示しながら、**複数候補の確認**や**部分的な提案の受け入れ**を含めて解説します。
+## 1. チャットについて
+
+**Copilot Chat** は VS Code 上で会話しながら、設計相談・コード提案・差分適用・自動実行（ツール連携）まで行える機能です。自然言語で質問や指示を出すことで、コードの説明、生成、デバッグ、リファクタリングなど、様々な開発タスクをサポートします。
+
+> **ポイント**
+>
+> * **自然言語での対話** … 日本語や英語で質問や指示が可能
+> * **コンテキスト理解** … 開いているファイルや選択範囲を自動認識
+> * **継続的な会話** … 前の質問を踏まえた追加質問が可能
 
 ---
 
-## :pen: 例題1. 基本的なコード補完
+## 2. モード早見表
 
-まず、関数本体をコメントだけにして止めてみます。
+Copilot Chat には 3 つのモードがあり、下記のような特徴があります。
+現在だと、基本的に Agent モードを使用するのが主流となっております。
+
+| 項目          | **Ask モード**                   | **Edit モード**                                             | **Agent モード**                                           |
+| ----------- | ----------------------------- | -------------------------------------------------------- | ------------------------------------------------------- |
+| 主目的         | コード/技術に関する質問・説明・方針検討（Q&A）     | 指定したファイル群へのコード編集提案をその場で反映                                | 高レベル要件から**自律的に計画→編集→（必要に応じて）ツール/ターミナル実行→反復**            |
+| 代表的な使いどころ   | 「この関数の役割は？」「実装案を3つ」などの理解/設計相談 | 「このファイル群を async/await へ」「このクラスにテストを追加」など**範囲が分かっている変更**  | 「OAuth でログイン導入」「Redis キャッシュ化」など**複数ファイル＋コマンド実行を伴う複雑作業** |
+| 典型プロンプト例    | 「DB接続はどこ？」「このソート関数を解説して」      | 「`services/*.ts` をDIに統一」「`Calculator` に Vitest で単体テスト追加」 | 「既存認証をOAuthへ置換」「React→Vueへ移行計画を立て実装」                    |
+
+### 2.1 使い分けの指針
+
+**Ask モードを使う場面：**
+- プロジェクトの構造や概念を理解したい
+- 複数のファイルにまたがる質問
+- 技術選択や設計の相談
+- エラーメッセージの詳細な解説
+
+**Edit モードを使う場面：**
+- 特定のコードを修正・改善したい
+- 関数やメソッドを追加したい
+- 選択範囲のコードを書き換えたい
+- 素早くコードを生成したい
+
+**Agent モードを使う場面：**
+- 複数ファイルにまたがる機能追加
+- コマンド実行を伴う作業
+- 自律的な問題解決が必要な場合
+- プロジェクト全体の変更
+
+---
+
+## 3. チャットビューの使い方
+
+### :pen: 例題1 - チャットビューの基本操作
+
+**目的**：Chat ビューでモードを切り替え、モデルを選び、プロンプトを送信する基本操作を掴む。
+
+**手順**
+
+1. **Chat ビューを開く**
+   * ショートカット：**Mac** `⌃⌘I` / **Windows・Linux** `Ctrl+Alt+I`
+   * または検索窓の右側のチャットアイコンをクリック
+   ![チャットアイコン](../images/chaticon.png)
+
+2. **モードを選択**
+   * 入力欄上の**モードドロップダウン**から *Ask / Edit / Agent* を選択（デフォルトは Agent）
+
+3. **モデルを選択**
+   * 入力欄の**モデルピッカー**で使用する言語モデルを選ぶ（契約や設定により候補は変動）
+
+4. **プロンプトを入力して送信**
+   * 入力欄に質問を書き、**Enter** または送信アイコンで送る
+   ![チャット](../images/chatview.png)
+
+**プロンプト例**
+
+```text
+JavaScript で FizzBuzz を最小限に実装して fizzbuzz.js に出力して。
+可読性重視、1～20を例で出力して。
+```
+
+### :robot: 出力例
 
 ```javascript
-function calculateSum(a, b) {
-   // ここで実装を中断
+/**
+ * FizzBuzz実装
+ * 可読性を重視したシンプルな実装
+ */
+
+/**
+ * FizzBuzzの判定と出力を行う関数
+ * @param {number} num - 判定する数値
+ * @returns {string} - FizzBuzz、Fizz、Buzz、または数値の文字列
+ */
+function fizzBuzz(num) {
+    if (num % 15 === 0) return "FizzBuzz";
+    if (num % 3 === 0) return "Fizz";
+    if (num % 5 === 0) return "Buzz";
+    return num.toString();
+}
+
+/**
+ * 指定した範囲でFizzBuzzを実行
+ * @param {number} start - 開始数値
+ * @param {number} end - 終了数値
+ */
+function runFizzBuzz(start, end) {
+    console.log(`FizzBuzz: ${start}～${end}`);
+    console.log("==============================");
+
+    for (let i = start; i <= end; i++) {
+        console.log(`${i}: ${fizzBuzz(i)}`);
+    }
+}
+
+// 1～20の例を実行
+runFizzBuzz(1, 20);
+
+// Node.js モジュールとして利用できるようにエクスポート
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { fizzBuzz, runFizzBuzz };
 }
 ```
 
-これで入力を中断すると、Copilot が残りの実装を**ゴーストテキスト**（薄いグレーのテキスト）で提案してくれます。
+**操作：**
+1. 生成されたコードを確認
+2. 「挿入」ボタンでエディタに挿入
+3. 必要に応じて追加の修正を依頼
 
-**提案の受け入れ**
-- **Tabキー** で提案を承認
-- **Escキー** で却下
-- **部分受け入れ**: Mac: `⌘→` / Windows/Linux: `Ctrl+→` で次の単語だけを承認
-
-##  :robot: 出力例
-
-```javascript
-function calculateSum(a, b) {
-   return a + b;
-}
-```
-
-![補完結果イメージ](../images/code_suggestion.png)
-
----
-
-##  :pen: 例題2. コメント駆動でのコード生成
-
-コメントを使って、具体的な実装を指示できます。
-
-```javascript
-// JavaScript で Student クラスを作成
-// プロパティ: name, age, grade
-// メソッド: getInfo() - 学生情報を文字列で返す
-// メソッド: isAdult() - 18歳以上かどうかを返す
-```
-
-このようなコメントを書くと、Copilot が意図に沿ったクラス構造を提案してくれます。
-
-##  :robot: 出力例
-
-```javascript
-// JavaScript で Student クラスを作成
-// プロパティ: name, age, grade
-// メソッド: getInfo() - 学生情報を文字列で返す
-// メソッド: isAdult() - 18歳以上かどうかを返す
-class Student {
-   constructor(name, age, grade) {
-      this.name = name;
-      this.age = age;
-      this.grade = grade;
-   }
-
-   getInfo() {
-      return `Name: ${this.name}, Age: ${this.age}, Grade: ${this.grade}`;
-   }
-
-   isAdult() {
-      return this.age >= 18;
-   }
-}
-
-// 利用例
-const s = new Student("Taro", 19, "A");
-console.log(s.getInfo());
-console.log("isAdult:", s.isAdult());
-```
+> 💡 **Tips: 目的別のモデル選択**
+> 
+> GitHub Copilot では、タスクに応じて最適な AI モデルを選択できます。VS Code の Copilot Chat でモデルを切り替えることで、より適切な提案を受けられます。
+>
+> ### タスク別の推奨モデル
+>
+> | タスク | 推奨モデル | 特徴 |
+> |--------|------------|------|
+> | **汎用的なコーディング・ライティング** | GPT-4.1, GPT-5-Codex, GPT-5 mini | 高速で正確なコード補完・説明。Agent モード対応 |
+> | **高速・反復的なタスク** | Claude Haiku 4.5 | 小規模な関数編集、構文質問、プロトタイピングに最適 |
+> | **深い推論・デバッグ** | GPT-5 mini, GPT-5, Claude Sonnet 4, Claude Opus 4.1, Gemini 2.5 Pro | 複雑なリファクタリング、アーキテクチャ設計、マルチファイル解析 |
+> | **ビジュアル対応（図表・スクリーンショット）** | GPT-5 mini, Claude Sonnet 4, Gemini 2.5 Pro | UI コンポーネント、ダイアグラム、ビジュアルフィードバック |
+>
+> ### 使い分けの指針
+>
+> - **日常的なコーディング**: デフォルトの GPT-4.1 または GPT-5 mini で十分
+> - **簡単な修正・繰り返し作業**: Claude Haiku 4.5 で高速応答
+> - **複雑なバグや設計判断**: GPT-5、Claude Sonnet 4、Gemini 2.5 Pro に切り替え
+> - **画面やダイアグラムの質問**: ビジュアル対応モデルを使用
+>
+> > ⚠️ **注意**: モデルによってリクエストのコスト（premium request multipliers）が異なります。詳細は [GitHub Copilot のリクエスト管理](https://docs.github.com/en/copilot/managing-copilot/monitoring-usage-and-entitlements/about-premium-requests)を参照してください。
+>
+> > 💡 **自動モデル選択**: VS Code や Visual Studio の Copilot Chat で「Auto」を選択すると、タスクに応じて最適なモデルが自動的に選択されます。詳細は [Copilot の自動モデル選択](https://docs.github.com/en/copilot/concepts/auto-model-selection)を参照してください。
 
 ---
 
+## 4. コンテキストの追加
 
-## 複数の候補を表示する
+Copilot Chat により関連性の高い回答を得るには、適切なコンテキストを提供することが重要です。VS Code では、**暗黙的なコンテキスト**と**明示的なコンテキスト**の2種類のコンテキスト追加方法があります。
 
-入力内容によっては、Copilot が**複数の候補**を提示することがあります。
+### 4.1 暗黙的なコンテキスト
 
-![複数候補](../images/multi_suggest.png)
+VS Code は現在のアクティビティに基づいて、自動的にコンテキストをチャットプロンプトに追加します：
 
-- Windows/Linux: **Alt + ]** (次の候補)、**Alt + [** (前の候補)
-- macOS: **Option + ]** (次の候補)、**Option + [** (前の候補)
+- **現在選択中のテキスト**：エディタで選択されているコード
+- **アクティブなファイル名**：現在開いているファイルまたはノートブック
+- **Ask モードまたは Edit モード**：アクティブなファイルが自動的にコンテキストとして含まれる
 
-たとえば「return a + b」以外にも「sum = a + b; return sum」など変数を使った異なるパターンが候補に出ることがあります。好きな案を選んでTabキーで受け入れる、必要なければEscキーでスキップしましょう。
+> **補足**: Agent モードでは、エージェントツールが自動的にアクティブファイルをコンテキストに追加すべきか判断します。
+
+### 4.2 明示的なコンテキスト追加方法
+
+チャットに明示的にコンテキストを追加する方法は複数あります：
+
+#### 1. **#-メンション** でコンテキストを参照
+
+入力欄で `#` を入力すると、利用可能なコンテキスト項目のリストが表示されます。
+
+**主なコンテキスト項目:**
+- `#file <path>`: 単一ファイルを明示的に参照
+- `#codebase`: リポジトリ横断検索を有効化（ワークスペース全体から関連ファイルを自動検索）
+- `#changes`: ソース管理の変更差分を参照
+- `#selection`: 現在のエディタ選択範囲を参照
+- `#terminalSelection`: ターミナルの選択範囲を参照
+- `#problems`: Problems パネルのワークスペースの問題を参照
+
+#### 2. **Add Context** ボタンを使用
+
+![コンテキスト](../images/addcontext.png)
+
+Chat ビューの入力欄にある **Add Context** ボタンをクリックしてコンテキストを追加できます：
+
+**主なコンテキスト項目:**
+- **Files & Folders**: ワークスペース内のファイルやフォルダ
+- **Symbols**: クラス、関数、メソッドなどのコードシンボル
+- **Tools**: `#codebase`、`#fetch` などの組み込みツール
+
+#### 3. **ドラッグ＆ドロップ**
+
+以下の要素をチャットビューにドラッグ＆ドロップできます：
+- Explorer ビューや検索ビューからファイルやフォルダ
+- Problems パネルの項目
+
+#### 4. **外部ソースの参照**
+
+- `#fetch <URL>`: 特定の Web ページのコンテンツを取得（APIリファレンスやドキュメントの参照に便利）
+- `#githubRepo <owner/repo>`: GitHub リポジトリ内でコード検索を実行
+
+> **💡 Tips**:
+> - `#codebase` を使用すると、どのファイルが関連しているか不明な場合でも、VS Code が自動的に適切なファイルを見つけます
+> - ファイルを参照する際は、可能な限り完全な内容が含まれます。大きすぎる場合は、関数の概要（実装なし）が含まれます
+> - 設定 `github.copilot.chat.codesearch.enabled` を有効にすると、より良い検索結果が得られます
 
 ---
 
-## 部分的な提案の受け入れ
+### :pen: 例題2 - ファイル参照でテストコード生成
 
-GitHub Copilot が複数行をまとめて提案した場合、「全部はいらないけど、一部だけ取り込みたい」ことがあります。そこで**部分的な受け入れ**が可能です。
+**目的**：例題1で作成した `fizzbuzz.js` のロジックを理解させ、テストコードを自動生成させる。
 
-![部分的提案の受け入れ](../images/accept_part.png)
+**手順**
+1. 例題1の FizzBuzz 実装を `fizzbuzz.js` として保存
+2. Chat ビューで **Add Context** からそのファイルを追加、または入力欄で `#file:fizzbuzz.js`
+3. 併せて `#codebase` を付与すると関連使用例も探索可能
+4. プロンプト送信
 
-1. **次の単語だけ承諾**
-   - マウスを候補上に置くと「Accept Word」というボタンが表示されます。
-   - Windows/Linuxでは **Ctrl + →**、macOSでは **Cmd + →** のショートカットも利用できます。
+**プロンプト例**
+```text
+#file:fizzbuzz.js を読み Jest の単体テストを生成。ケース: 1..20 を網羅し、15/3/5/その他をグループ化。失敗例も1件含めて。
+```
 
-2. **次の行だけ承諾**
-   - マウスを候補上に置くと「Accept Line」というボタンが表示されます。
-   - `editor.action.inlineSuggest.acceptNextLine` にカスタムキーを割り当てることで、この行だけを受け入れることが可能です。
+### :robot: 出力例
 
+```javascript
+const { fizzBuzz } = require('../fizzbuzz');
+
+describe('FizzBuzz - 1..20 の網羅', () => {
+  test('3の倍数はFizz、5の倍数はBuzz、15の倍数はFizzBuzzになる', () => {
+    const expected = {
+      3: 'Fizz', 5: 'Buzz', 6: 'Fizz', 9: 'Fizz', 10: 'Buzz', 12: 'Fizz', 15: 'FizzBuzz', 18: 'Fizz', 20: 'Buzz'
+    };
+
+    for (const [numStr, expectedVal] of Object.entries(expected)) {
+      const num = Number(numStr);
+      expect(fizzBuzz(num)).toBe(expectedVal);
+    }
+  });
+
+  test('1..20 を順にチェック（グループ化: 15/3/5/その他）', () => {
+    const groups = {
+      fizzbuzz: [15],
+      fizz: [3,6,9,12,18],
+      buzz: [5,10,20],
+      others: [1,2,4,7,8,11,13,14,16,17,19]
+    };
+
+    for (const n of groups.fizzbuzz) expect(fizzBuzz(n)).toBe('FizzBuzz');
+    for (const n of groups.fizz) expect(fizzBuzz(n)).toBe('Fizz');
+    for (const n of groups.buzz) expect(fizzBuzz(n)).toBe('Buzz');
+    for (const n of groups.others) expect(fizzBuzz(n)).toBe(n.toString());
+  });
+
+  test('意図的失敗ケース（ナンバー7をFizzにする誤期待）', () => {
+    // ここでは意図的に期待値を間違えて1件失敗させる
+    expect(fizzBuzz(7)).toBe('Fizz');
+  });
+});
+```
+
+**操作：**
+1. 生成されたテストコードを確認
+2. 「挿入」ボタンで新規ファイル `fizzbuzz.test.js` に保存
+3. テストを実行して動作確認
 
 ---
 
-## Next Edit Suggestions（NES）
+### :pen: 例題3 - Web ページ参照でモデル情報取得
 
-GitHub Copilot の **Next Edit Suggestions（NES）** は、現在の編集に基づいて次に必要な編集箇所を予測し、提案してくれる機能です。
-インライン補完が「今この行」を埋めるのに特化しているのに対し、**NES は“変更が波及しそうな次の編集箇所”へ Tab でジャンプできるナビゲーション支援**です。設定で `github.copilot.nextEditSuggestions.enabled` を ON にすると：
-- 変数 / 関数 / クラス名を 1 箇所リネーム → 残りの出現箇所を順送りで確認
-- 新フィールド追加 → 関連メソッドや計算式への反映漏れを案内
-- 条件やロジックの一部変更 → 連動する比較・派生処理の更新候補を提示
-“どこをまだ直していないか” の記憶コストを減らし、リネームや構造変更で威力を発揮します。
+**目的**：`#fetch` で Azure AI Foundry (OpenAI) の概要ページを取得し、利用可能モデルを分類・要約させる。
 
-### 設定の有効化
+**手順**
+1. `#fetch https://learn.microsoft.com/ja-jp/azure/ai-foundry/openai/overview` を送信
+2. 続けて整理したい粒度（性能指標・料金比較観点など）を追加プロンプトで指定
 
-まず、VS Code の設定で NES を有効化します：
-
-1. **設定** > **拡張機能** > **GitHub Copilot**
-2. `github.copilot.nextEditSuggestions.enabled` を **有効** にする
-
-または、設定画面で `Next Edit Suggestions` を検索して有効化してください。
-
-### :pen: 例題3. リネームの自動適用
-例題2で作成した Student クラスの `age` プロパティを `yearsOld` にリネームしてみます。
-```javascript
-// プロパティ: name, yearsOld, grade
+**プロンプト例**
+```text
+#fetch https://learn.microsoft.com/ja-jp/azure/ai-foundry/openai/overview を読み、
+Azure OpenAI で使用できるモデルを教えて。
 ```
 
-1. `age` を 1 箇所 `yearsOld` に変更すると、**ガターに矢印**が表示される場合があります
-2. **Tabキー** を押すと、次の編集提案（他の `age` 出現箇所）にジャンプ
-3. 再度 **Tabキー** で変更を確定し、すべての参照が更新されるか確認
+### :robot: 出力例
 
-###  :robot: 出力例
+```
+指定ページを読み、Azure OpenAI（Azure AI Foundry 内）で利用可能と明記されているモデル群を抽出しました。
+以下はページに記載されている主なモデルの一覧です：
 
-```javascript
-// リネーム後（例）: age -> yearsOld
-class Student {
-   constructor(name, yearsOld, grade) {
-      this.name = name;
-      this.yearsOld = yearsOld;
-      this.grade = grade;
-   }
+【GPT-5 シリーズ】
+- o4-mini
+- o3
+- gpt-4.1
+- o3-mini
+- o1
+- o1-mini
+- GPT-4o
+- GPT-4o mini
+- GPT-4 Turbo with Vision
+- GPT-4（GPT-4 系全般）
 
-   getInfo() {
-      return `Name: ${this.name}, YearsOld: ${this.yearsOld}, Grade: ${this.grade}`;
-   }
-
-   isAdult() {
-      return this.yearsOld >= 18;
-   }
-}
+【その他のモデル】
+- GPT-3.5-Turbo シリーズ
+- 埋め込み（Embeddings）シリーズ
+- GPT-image-1（画像生成・編集モデル） — プレビュー
+- DALL-E（画像生成）
+- 音声関連モデル（音声→テキスト / テキスト→音声）
+- テキスト読み上げモデル（プレビュー）
+- Codex（コード生成関連）
 ```
 
-![NES](../images/nes.png)
+**操作：**
+1. 情報を確認
+2. 追加で詳細な情報が必要な場合は追加質問
+3. 必要に応じてコピーして資料に活用
 
-> 補足: NES の提案が多すぎて視界が騒がしい場合は `editor.inlineSuggest.edits.showCollapsed` を有効にし、必要な時だけ展開する運用が有効です。
+---
+
+## 5. 過去のリクエストの編集
+
+### :pen: 例題4 - リクエスト内容の変更とチェックポイント
+
+**目的**：直前の指示ミスや条件追加を"過去メッセージを編集"してやり直す。必要ならワークスペースも**チェックポイント**で巻き戻す。
+
+**手順**
+
+1. **編集したいリクエストを選択**
+   * チャット内で該当メッセージに**ホバー**し、クリック
+
+2. **内容を修正して再送**
+   * メッセージ内容を編集（メッセージの編集にはモデルやモードの変更も含まれます）
+   * 送信すると、そのメッセージ以降の履歴および変更内容は取り消され、新しいレスポンスが返る
+   ![リクエストの編集](../images/request-edit.png)
+
+3. **必要ならチェックポイントを復元**
+   * 設定 `chat.checkpoints.enabled` を有効化すると、要所でスナップショットが作られる
+   * 復元は対象メッセージにホバー→**Restore Checkpoint**→確認
+   * **Redo**でやり直しも可能
+   ![チェックポイント](../images/checkpoint.png)
+
+> ⚠️ **注意**: 複数個前のメッセージを編集した場合、そこまでに行ったチャット履歴は削除され変更は巻き戻ります。この巻き戻りに関してはやり直しが効かないので気をつけてください。
 
 ---
 
 ## :memo: 練習
 
-1. **基本的なコード補完を試す**
-   途中まで関数を書いて、ゴーストテキストが表示されたら Tab で受け入れてみる。
-   部分受け入れ（Mac: `⌘→` / Windows/Linux: `Ctrl+→`）も試してみてください。
+以下の練習でチャットの使い方を習得しましょう：
 
-2. **コメント駆動開発を体験**
-   コメントで実装したい内容を詳しく書いて、Copilot に生成させてみる。
-   - クラスの構造
-   - 関数の処理内容
-   - アルゴリズムの方針など
+1. **基本操作の練習**
+   - Chat ビューを開き、モードとモデルを選択
+   - 簡単な質問（「このプロジェクトの概要は？」等）を送信
+   - 生成された回答を確認
 
-3. **複数候補を確かめる**
-   Alt + ] / Alt + [ で前後の候補を比較し、好きなものを受け入れてみる。
-   `Ctrl + Enter` で複数候補の一括表示も試してみましょう。
+2. **コンテキストを活用した質問**
+   - `#file` を使って特定ファイルについて質問
+   - `#codebase` を使ってプロジェクト全体から情報を検索
+   - `#fetch` で外部ドキュメントを参照
 
-4. **Next Edit Suggestions（NES）を活用**
-   変数名やクラス名を変更して、ガターの矢印が表示されることを確認。
-   Tab キーで次の編集箇所にジャンプし、連鎖的な編集を体験してみましょう。
+3. **テストコード生成**
+   - 既存のコードファイルを指定してテストコードを生成
+   - 生成されたテストを実行して動作確認
 
-5. **部分的承諾の活用**
-   ログ出力や不要な初期化コードを含む提案が出た場合、一部だけを承諾・残りをスキップしてみましょう。
+4. **リクエストの編集**
+   - 過去のリクエストを編集して再送信
+   - チェックポイント機能を試す
+
+> チャットを使いこなすことで、コーディングの効率が大幅に向上します。最初は簡単な質問から始めて、徐々に複雑なタスクにチャレンジしましょう。
 
 ---
 
 ## まとめ
 
-- **基本的なコード補完**: 途中まで書くと Copilot がゴーストテキストで残りを推測・補完
-- **コメント駆動開発**: 詳細なコメントを書くことで、意図に沿ったコード構造を生成可能
-- **複数の候補**: Alt + ] / Alt + [ で前後を切り替えてベストなものを選択
-- **部分的な承諾**: Mac: `⌘→` / Windows/Linux: `Ctrl+→` で単語単位の受け入れが可能
-- **Next Edit Suggestions（NES）**: 変数名変更などの編集に基づいて、次の編集箇所を自動予測・提案
+* **コンテキスト**（`#file` / `#codebase` / Add Context / ツール）を適切に渡すほど精度は上がる
+* **過去リクエストの編集**と**チェックポイント**で、やり直しや巻き戻しが安全にできる
+* **モデル選択**により、タスクに最適な AI の能力を活用できる
